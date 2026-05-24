@@ -137,29 +137,7 @@ export default function Home() {
   const radarCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const chatMessagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  // --- EFFECTS FOR CANVAS DRAWINGS ---
-  useEffect(() => {
-    if (currentPage === "dashboard") {
-      drawDashboardSensorChart();
-      drawDashboardForecastChart();
-    }
-  }, [currentPage, outputs]);
 
-  useEffect(() => {
-    if (currentPage === "matchmaker") {
-      const match = matches.find(m => m.id === selectedMatchId);
-      if (match) {
-        drawRadarChart(match.details);
-      }
-    }
-  }, [currentPage, selectedMatchId, matches]);
-
-  useEffect(() => {
-    // Scroll chat to bottom
-    if (chatMessagesEndRef.current) {
-      chatMessagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [chatMessages, chatIsTyping]);
 
   // --- LOGIN / LOGOUT MOCKS ---
   const handleLogin = (role: "user" | "osb") => {
@@ -177,7 +155,7 @@ export default function Home() {
   };
 
   // --- DRAWING IoT SENSOR LINE CHART ---
-  const drawDashboardSensorChart = () => {
+  function drawDashboardSensorChart() {
     const canvas = sensorCanvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -260,7 +238,7 @@ export default function Home() {
   };
 
   // --- DRAWING FORECAST CHART ---
-  const drawDashboardForecastChart = () => {
+  function drawDashboardForecastChart() {
     const canvas = forecastCanvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -352,7 +330,7 @@ export default function Home() {
   };
 
   // --- DRAWING RADAR CHART ---
-  const drawRadarChart = (details: MatchCandidate["details"]) => {
+  function drawRadarChart(details: MatchCandidate["details"]) {
     const canvas = radarCanvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -447,6 +425,29 @@ export default function Home() {
       ctx.stroke();
     }
   };
+  // --- EFFECTS FOR CANVAS DRAWINGS ---
+  useEffect(() => {
+    if (currentPage === "dashboard") {
+      drawDashboardSensorChart();
+      drawDashboardForecastChart();
+    }
+  }, [currentPage, outputs]);
+
+  useEffect(() => {
+    if (currentPage === "matchmaker") {
+      const match = matches.find(m => m.id === selectedMatchId);
+      if (match) {
+        drawRadarChart(match.details);
+      }
+    }
+  }, [currentPage, selectedMatchId, matches]);
+
+  useEffect(() => {
+    // Scroll chat to bottom
+    if (chatMessagesEndRef.current) {
+      chatMessagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [chatMessages, chatIsTyping]);
 
   // --- INTERACTIVE SVG ROUTE MAP MOCK ---
   const renderRouteSvgMap = (match: MatchCandidate) => {
