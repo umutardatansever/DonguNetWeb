@@ -672,7 +672,7 @@ export default function Home() {
               <div className="absolute inset-0 bg-hero-glow z-0"></div>
 
               {/* Ticker */}
-              <div className="relative -mt-4 mb-8 lg:absolute lg:top-8 lg:left-0 lg:mt-0 lg:mb-0 w-full overflow-hidden bg-slate-800/40 backdrop-blur-sm border-y border-white/5 py-3 z-20 ticker-container">
+              <div className="absolute top-8 left-0 w-full overflow-hidden bg-slate-800/40 backdrop-blur-sm border-y border-white/5 py-3 z-20 ticker-container">
                 <div className="ticker-content flex gap-8 sm:gap-16 text-accent-mint text-[10px] sm:text-xs font-semibold uppercase tracking-widest whitespace-nowrap">
                   <span className="flex items-center shrink-0"><span className="material-symbols-outlined align-middle mr-2 text-[16px] sm:text-[18px]">recycling</span> 1,240 Ton Atık Geri Kazandırıldı</span>
                   <span className="text-slate-700 shrink-0">•</span>
@@ -687,7 +687,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10 w-full items-center mt-12">
+              <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10 w-full items-center pt-20 lg:pt-0 mt-12">
                 <div className="lg:col-span-7 flex flex-col items-start gap-6">
                   <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800 border border-white/5 text-accent-mint text-xs font-semibold uppercase tracking-widest">
                     <span className="w-2 h-2 rounded-full bg-accent-mint animate-pulse"></span>
