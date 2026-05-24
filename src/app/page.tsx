@@ -1381,7 +1381,7 @@ export default function Home() {
       {/* MODAL 1: ADD OUTPUT */}
       {showOutputModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="glass-panel w-full max-w-lg p-8 rounded-2xl flex flex-col gap-6 shadow-2xl relative">
+          <div className="glass-panel w-full max-w-lg mx-4 md:mx-0 p-6 md:p-8 rounded-2xl flex flex-col gap-6 shadow-2xl relative">
             <div className="flex justify-between items-center">
               <h3 className="font-title font-bold text-lg text-white">Yeni Çıktı / Atık Girişi</h3>
               <button onClick={() => setShowOutputModal(false)} className="text-on-surface-variant hover:text-white">
@@ -1463,7 +1463,7 @@ export default function Home() {
       {/* MODAL 2: ADD INPUT */}
       {showInputModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="glass-panel w-full max-w-lg p-8 rounded-2xl flex flex-col gap-6 shadow-2xl relative">
+          <div className="glass-panel w-full max-w-lg mx-4 md:mx-0 p-6 md:p-8 rounded-2xl flex flex-col gap-6 shadow-2xl relative">
             <div className="flex justify-between items-center">
               <h3 className="font-title font-bold text-lg text-white">Yeni Girdi / Hammadde İhtiyacı</h3>
               <button onClick={() => setShowInputModal(false)} className="text-on-surface-variant hover:text-white">
@@ -1545,7 +1545,7 @@ export default function Home() {
       {/* MODAL 3: DPP PASSPORT VIEW */}
       {showDppModal && selectedDppOutput && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="glass-panel w-full max-w-2xl p-8 rounded-2xl flex flex-col gap-6 shadow-2xl relative">
+          <div className="glass-panel w-full max-w-2xl mx-4 md:mx-0 p-6 md:p-8 rounded-2xl flex flex-col gap-6 shadow-2xl relative">
             <div className="flex justify-between items-center border-b border-white/5 pb-4">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-accent-mint">qr_code_2</span>
@@ -1603,7 +1603,7 @@ export default function Home() {
       {/* MODAL 4: MATCH CONFIRMED / SUCCESS */}
       {showSuccessModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="glass-panel w-full max-w-lg p-8 rounded-2xl flex flex-col items-center text-center gap-6 shadow-2xl relative">
+          <div className="glass-panel w-full max-w-lg mx-4 md:mx-0 p-6 md:p-8 rounded-2xl flex flex-col items-center text-center gap-6 shadow-2xl relative">
             <div className="w-16 h-16 rounded-full bg-accent-mint/10 border-2 border-accent-mint flex items-center justify-center animate-bounce">
               <span className="material-symbols-outlined text-accent-mint text-4xl">handshake</span>
             </div>
