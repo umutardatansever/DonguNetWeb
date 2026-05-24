@@ -672,18 +672,18 @@ export default function Home() {
               <div className="absolute inset-0 bg-hero-glow z-0"></div>
 
               {/* Ticker */}
-              <div className="absolute top-8 left-0 w-full overflow-hidden bg-slate-800/40 backdrop-blur-sm border-y border-white/5 py-3.5 z-20 ticker-container">
-                <div className="ticker-content flex gap-16 text-accent-mint text-xs font-semibold uppercase tracking-widest">
-                  <span className="flex items-center"><span className="material-symbols-outlined align-middle mr-2 text-[18px]">recycling</span> 1,240 Ton Atık Geri Kazandırıldı</span>
-                  <span className="text-slate-700">•</span>
-                  <span className="flex items-center"><span className="material-symbols-outlined align-middle mr-2 text-[18px]">co2</span> 450 Ton CO2 Azaltımı Sağlandı</span>
-                  <span className="text-slate-700">•</span>
-                  <span className="flex items-center"><span className="material-symbols-outlined align-middle mr-2 text-[18px]">payments</span> €150,000 SKDM Karbon Vergisi Tasarrufu</span>
-                  <span className="text-slate-700">•</span>
+              <div className="relative -mt-4 mb-8 lg:absolute lg:top-8 lg:left-0 lg:mt-0 lg:mb-0 w-full overflow-hidden bg-slate-800/40 backdrop-blur-sm border-y border-white/5 py-3 z-20 ticker-container">
+                <div className="ticker-content flex gap-8 sm:gap-16 text-accent-mint text-[10px] sm:text-xs font-semibold uppercase tracking-widest whitespace-nowrap">
+                  <span className="flex items-center shrink-0"><span className="material-symbols-outlined align-middle mr-2 text-[16px] sm:text-[18px]">recycling</span> 1,240 Ton Atık Geri Kazandırıldı</span>
+                  <span className="text-slate-700 shrink-0">•</span>
+                  <span className="flex items-center shrink-0"><span className="material-symbols-outlined align-middle mr-2 text-[16px] sm:text-[18px]">co2</span> 450 Ton CO2 Azaltımı Sağlandı</span>
+                  <span className="text-slate-700 shrink-0">•</span>
+                  <span className="flex items-center shrink-0"><span className="material-symbols-outlined align-middle mr-2 text-[16px] sm:text-[18px]">payments</span> €150,000 SKDM Karbon Vergisi Tasarrufu</span>
+                  <span className="text-slate-700 shrink-0">•</span>
                   {/* Duplicate for loop */}
-                  <span className="flex items-center"><span className="material-symbols-outlined align-middle mr-2 text-[18px]">recycling</span> 1,240 Ton Atık Geri Kazandırıldı</span>
-                  <span className="text-slate-700">•</span>
-                  <span className="flex items-center"><span className="material-symbols-outlined align-middle mr-2 text-[18px]">co2</span> 450 Ton CO2 Azaltımı Sağlandı</span>
+                  <span className="flex items-center shrink-0"><span className="material-symbols-outlined align-middle mr-2 text-[16px] sm:text-[18px]">recycling</span> 1,240 Ton Atık Geri Kazandırıldı</span>
+                  <span className="text-slate-700 shrink-0">•</span>
+                  <span className="flex items-center shrink-0"><span className="material-symbols-outlined align-middle mr-2 text-[16px] sm:text-[18px]">co2</span> 450 Ton CO2 Azaltımı Sağlandı</span>
                 </div>
               </div>
 
