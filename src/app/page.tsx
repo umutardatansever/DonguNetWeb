@@ -875,33 +875,33 @@ export default function Home() {
               {currentPage === "dashboard" && (
                 <div className="flex flex-col gap-6">
                   {/* Bento Stats */}
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div className="glass-panel p-6 rounded-2xl flex flex-col justify-between">
-                      <span className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Aktif Ürün/Atık</span>
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="glass-panel p-4 md:p-6 rounded-2xl flex flex-col justify-between">
+                      <span className="text-[10px] md:text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Aktif Ürün/Atık</span>
                       <div className="flex items-baseline justify-between mt-4">
-                        <span className="text-3xl font-extrabold font-title text-white">{outputs.length}</span>
-                        <span className="material-symbols-outlined text-accent-mint text-2xl">arrow_upward</span>
+                        <span className="text-xl md:text-3xl font-extrabold font-title text-white">{outputs.length}</span>
+                        <span className="material-symbols-outlined text-accent-mint text-lg md:text-2xl">arrow_upward</span>
                       </div>
                     </div>
-                    <div className="glass-panel p-6 rounded-2xl flex flex-col justify-between">
-                      <span className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Tanımlı Girdi İhtiyacı</span>
+                    <div className="glass-panel p-4 md:p-6 rounded-2xl flex flex-col justify-between">
+                      <span className="text-[10px] md:text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Tanımlı Girdi</span>
                       <div className="flex items-baseline justify-between mt-4">
-                        <span className="text-3xl font-extrabold font-title text-white">{inputs.length}</span>
-                        <span className="material-symbols-outlined text-slate-500 text-2xl">horizontal_rule</span>
+                        <span className="text-xl md:text-3xl font-extrabold font-title text-white">{inputs.length}</span>
+                        <span className="material-symbols-outlined text-slate-500 text-lg md:text-2xl">horizontal_rule</span>
                       </div>
                     </div>
-                    <div className="glass-panel p-6 rounded-2xl flex flex-col justify-between">
-                      <span className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Bekleyen AI Eşleşmesi</span>
+                    <div className="glass-panel p-4 md:p-6 rounded-2xl flex flex-col justify-between">
+                      <span className="text-[10px] md:text-xs font-semibold text-on-surface-variant uppercase tracking-wider">AI Eşleşmesi</span>
                       <div className="flex items-baseline justify-between mt-4">
-                        <span className="text-3xl font-extrabold font-title text-accent-mint">2</span>
-                        <span className="px-2 py-0.5 rounded bg-accent-mint/10 text-accent-mint text-[10px] font-bold">AI Aktif</span>
+                        <span className="text-xl md:text-3xl font-extrabold font-title text-accent-mint">2</span>
+                        <span className="hidden sm:inline-block px-2 py-0.5 rounded bg-accent-mint/10 text-accent-mint text-[10px] font-bold">AI Aktif</span>
                       </div>
                     </div>
-                    <div className="glass-panel p-6 rounded-2xl flex flex-col justify-between">
-                      <span className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Önlenen CO2 Emisyonu</span>
+                    <div className="glass-panel p-4 md:p-6 rounded-2xl flex flex-col justify-between">
+                      <span className="text-[10px] md:text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Önlenen CO2</span>
                       <div className="flex items-baseline justify-between mt-4">
-                        <span className="text-3xl font-extrabold font-title text-teal-400">900 kg</span>
-                        <span className="material-symbols-outlined text-teal-400 text-2xl">eco</span>
+                        <span className="text-xl md:text-3xl font-extrabold font-title text-teal-400">900 kg</span>
+                        <span className="material-symbols-outlined text-teal-400 text-lg md:text-2xl">eco</span>
                       </div>
                     </div>
                   </div>
@@ -968,71 +968,142 @@ export default function Home() {
                   {/* List Container */}
                   <div className="glass-panel rounded-2xl overflow-hidden">
                     {currentMaterialTab === "outputs" ? (
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                          <thead>
-                            <tr className="bg-slate-900 border-b border-white/5 text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">
-                              <th className="p-5">Malzeme Adı</th>
-                              <th className="p-5">Sınıf</th>
-                              <th className="p-5">Kimyasal Bileşim</th>
-                              <th className="p-5">Miktar (kg)</th>
-                              <th className="p-5">Stok (kg)</th>
-                              <th className="p-5">Kayıt Tarihi</th>
-                              <th className="p-5 text-right">İşlemler</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-white/5 text-sm text-white">
-                            {outputs.map(out => (
-                              <tr key={out.id}>
-                                <td className="p-5 font-semibold text-white">{out.name}</td>
-                                <td className="p-5">
-                                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-teal-400 border border-teal-500/10">{out.class}</span>
-                                </td>
-                                <td className="p-5 text-on-surface-variant">{out.composition}</td>
-                                <td className="p-5 font-mono text-white">{out.quantity.toLocaleString()}</td>
-                                <td className="p-5 font-mono text-white">{out.stock.toLocaleString()}</td>
-                                <td className="p-5 text-on-surface-variant">{out.date}</td>
-                                <td className="p-5 text-right">
-                                  <button onClick={() => { setSelectedDppOutput(out); setShowDppModal(true); }} className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-accent-mint/10 border border-accent-mint/20 text-accent-mint hover:bg-accent-mint/20 transition-all flex items-center gap-1 ml-auto">
-                                    <span className="material-symbols-outlined text-[14px]">qr_code_2</span>
-                                    Pasaport (DPP)
-                                  </button>
-                                </td>
+                      <div>
+                        {/* Desktop Table */}
+                        <div className="hidden md:block overflow-x-auto">
+                          <table className="w-full text-left border-collapse">
+                            <thead>
+                              <tr className="bg-slate-900 border-b border-white/5 text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">
+                                <th className="p-5">Malzeme Adı</th>
+                                <th className="p-5">Sınıf</th>
+                                <th className="p-5">Kimyasal Bileşim</th>
+                                <th className="p-5">Miktar (kg)</th>
+                                <th className="p-5">Stok (kg)</th>
+                                <th className="p-5">Kayıt Tarihi</th>
+                                <th className="p-5 text-right">İşlemler</th>
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                            </thead>
+                            <tbody className="divide-y divide-white/5 text-sm text-white">
+                              {outputs.map(out => (
+                                <tr key={out.id}>
+                                  <td className="p-5 font-semibold text-white">{out.name}</td>
+                                  <td className="p-5">
+                                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-teal-400 border border-teal-500/10">{out.class}</span>
+                                  </td>
+                                  <td className="p-5 text-on-surface-variant">{out.composition}</td>
+                                  <td className="p-5 font-mono text-white">{out.quantity.toLocaleString()}</td>
+                                  <td className="p-5 font-mono text-white">{out.stock.toLocaleString()}</td>
+                                  <td className="p-5 text-on-surface-variant">{out.date}</td>
+                                  <td className="p-5 text-right">
+                                    <button onClick={() => { setSelectedDppOutput(out); setShowDppModal(true); }} className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-accent-mint/10 border border-accent-mint/20 text-accent-mint hover:bg-accent-mint/20 transition-all flex items-center gap-1 ml-auto">
+                                      <span className="material-symbols-outlined text-[14px]">qr_code_2</span>
+                                      Pasaport (DPP)
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+
+                        {/* Mobile Cards */}
+                        <div className="md:hidden flex flex-col divide-y divide-white/5">
+                          {outputs.map(out => (
+                            <div key={out.id} className="p-4 flex flex-col gap-3">
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <h4 className="font-title font-bold text-white text-sm">{out.name}</h4>
+                                  <span className="text-[10px] text-on-surface-variant block mt-1">Kayıt: {out.date}</span>
+                                </div>
+                                <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-slate-800 text-teal-400 border border-teal-500/10 shrink-0">{out.class}</span>
+                              </div>
+                              <div className="grid grid-cols-3 gap-2 text-xs border-y border-white/[0.03] py-2">
+                                <div>
+                                  <span className="text-on-surface-variant text-[9px] block">Miktar</span>
+                                  <span className="text-white font-mono font-medium">{out.quantity.toLocaleString()} kg</span>
+                                </div>
+                                <div>
+                                  <span className="text-on-surface-variant text-[9px] block">Stok</span>
+                                  <span className="text-white font-mono font-medium">{out.stock.toLocaleString()} kg</span>
+                                </div>
+                                <div>
+                                  <span className="text-on-surface-variant text-[9px] block">Bileşim</span>
+                                  <span className="text-white truncate block max-w-[80px]" title={out.composition}>{out.composition}</span>
+                                </div>
+                              </div>
+                              <button onClick={() => { setSelectedDppOutput(out); setShowDppModal(true); }} className="w-full py-2.5 rounded-xl text-xs font-semibold bg-accent-mint/10 border border-accent-mint/20 text-accent-mint hover:bg-accent-mint/20 transition-all flex items-center justify-center gap-1.5">
+                                <span className="material-symbols-outlined text-[16px]">qr_code_2</span>
+                                Pasaport (DPP)
+                              </button>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     ) : (
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-left border-collapse">
-                          <thead>
-                            <tr className="bg-slate-900 border-b border-white/5 text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">
-                              <th className="p-5">Girdi / Hammadde</th>
-                              <th className="p-5">Sınıf</th>
-                              <th className="p-5">Teknik Özellik / Limit</th>
-                              <th className="p-5">Miktar (kg)</th>
-                              <th className="p-5">Frekans</th>
-                              <th className="p-5">Kayıt Tarihi</th>
-                              <th className="p-5 text-right">İşlemler</th>
-                            </tr>
-                          </thead>
-                          <tbody className="divide-y divide-white/5 text-sm text-white">
-                            {inputs.map(input => (
-                              <tr key={input.id}>
-                                <td className="p-5 font-semibold text-white">{input.name}</td>
-                                <td className="p-5">
-                                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-blue-400 border border-blue-500/10">{input.class}</span>
-                                </td>
-                                <td className="p-5 text-on-surface-variant">{input.specs}</td>
-                                <td className="p-5 font-mono text-white">{input.quantity.toLocaleString()}</td>
-                                <td className="p-5 text-on-surface-variant">{input.frequency}</td>
-                                <td className="p-5 text-on-surface-variant">{input.date}</td>
-                                <td className="p-5 text-right text-on-surface-variant text-xs font-medium">Eşleştirme Bekliyor</td>
+                      <div>
+                        {/* Desktop Table */}
+                        <div className="hidden md:block overflow-x-auto">
+                          <table className="w-full text-left border-collapse">
+                            <thead>
+                              <tr className="bg-slate-900 border-b border-white/5 text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">
+                                <th className="p-5">Girdi / Hammadde</th>
+                                <th className="p-5">Sınıf</th>
+                                <th className="p-5">Teknik Özellik / Limit</th>
+                                <th className="p-5">Miktar (kg)</th>
+                                <th className="p-5">Frekans</th>
+                                <th className="p-5">Kayıt Tarihi</th>
+                                <th className="p-5 text-right">İşlemler</th>
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                            </thead>
+                            <tbody className="divide-y divide-white/5 text-sm text-white">
+                              {inputs.map(input => (
+                                <tr key={input.id}>
+                                  <td className="p-5 font-semibold text-white">{input.name}</td>
+                                  <td className="p-5">
+                                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-blue-400 border border-blue-500/10">{input.class}</span>
+                                  </td>
+                                  <td className="p-5 text-on-surface-variant">{input.specs}</td>
+                                  <td className="p-5 font-mono text-white">{input.quantity.toLocaleString()}</td>
+                                  <td className="p-5 text-on-surface-variant">{input.frequency}</td>
+                                  <td className="p-5 text-on-surface-variant">{input.date}</td>
+                                  <td className="p-5 text-right text-on-surface-variant text-xs font-medium">Eşleştirme Bekliyor</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+
+                        {/* Mobile Cards */}
+                        <div className="md:hidden flex flex-col divide-y divide-white/5">
+                          {inputs.map(input => (
+                            <div key={input.id} className="p-4 flex flex-col gap-3">
+                              <div className="flex justify-between items-start">
+                                <div>
+                                  <h4 className="font-title font-bold text-white text-sm">{input.name}</h4>
+                                  <span className="text-[10px] text-on-surface-variant block mt-1">Kayıt: {input.date}</span>
+                                </div>
+                                <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-slate-800 text-blue-400 border border-blue-500/10 shrink-0">{input.class}</span>
+                              </div>
+                              <div className="grid grid-cols-3 gap-2 text-xs border-y border-white/[0.03] py-2">
+                                <div>
+                                  <span className="text-on-surface-variant text-[9px] block">İhtiyaç</span>
+                                  <span className="text-white font-mono font-medium">{input.quantity.toLocaleString()} kg</span>
+                                </div>
+                                <div>
+                                  <span className="text-on-surface-variant text-[9px] block">Frekans</span>
+                                  <span className="text-white font-medium">{input.frequency}</span>
+                                </div>
+                                <div className="col-span-1">
+                                  <span className="text-on-surface-variant text-[9px] block">Özellik</span>
+                                  <span className="text-white truncate block max-w-[80px]" title={input.specs}>{input.specs}</span>
+                                </div>
+                              </div>
+                              <div className="text-center text-on-surface-variant text-[11px] font-medium py-1">
+                                ⏳ Eşleştirme Bekliyor
+                              </div>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -1052,7 +1123,14 @@ export default function Home() {
                       {matches.map(m => (
                         <div 
                           key={m.id}
-                          onClick={() => setSelectedMatchId(m.id)}
+                          onClick={() => {
+                            setSelectedMatchId(m.id);
+                            if (typeof window !== "undefined" && window.innerWidth < 1024) {
+                              setTimeout(() => {
+                                document.getElementById("matchmaker-detail")?.scrollIntoView({ behavior: "smooth" });
+                              }, 100);
+                            }
+                          }}
                           className={`glass-panel p-5 rounded-2xl flex flex-col gap-3 cursor-pointer transition-all duration-300 ${
                             selectedMatchId === m.id ? "border-accent-mint/60 bg-accent-mint/[0.04]" : ""
                           }`}
@@ -1085,7 +1163,7 @@ export default function Home() {
                   </div>
 
                   {/* Right Column: Selected Detail */}
-                  <div className="lg:col-span-7 flex flex-col gap-6">
+                  <div id="matchmaker-detail" className="lg:col-span-7 flex flex-col gap-6 scroll-mt-24">
                     <div className="glass-panel p-6 rounded-2xl flex flex-col gap-6">
                       <div className="flex justify-between items-start border-b border-white/5 pb-4">
                         <div>
@@ -1274,25 +1352,25 @@ export default function Home() {
               {currentPage === "osb" && (
                 <div className="flex flex-col gap-6">
                   {/* OSB Stats */}
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                    <div className="glass-panel p-6 rounded-2xl">
-                      <span className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider block">OSB Toplam Simbiyoz Oranı</span>
-                      <span className="text-3xl font-extrabold font-title text-white mt-4 block">68%</span>
-                      <div className="w-full bg-slate-700 h-1.5 rounded-full mt-3 overflow-hidden">
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="glass-panel p-4 md:p-6 rounded-2xl flex flex-col justify-between">
+                      <span className="text-[10px] md:text-xs font-semibold text-on-surface-variant uppercase tracking-wider block">OSB Simbiyoz Oranı</span>
+                      <span className="text-xl md:text-3xl font-extrabold font-title text-white mt-2 block">68%</span>
+                      <div className="w-full bg-slate-700 h-1.5 rounded-full mt-2 overflow-hidden">
                         <div className="bg-accent-mint h-full rounded-full" style={{ width: "68%" }}></div>
                       </div>
                     </div>
-                    <div className="glass-panel p-6 rounded-2xl">
-                      <span className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider block">Kayıtlı Aktif Tesis</span>
-                      <span className="text-3xl font-extrabold font-title text-white mt-4 block">14 Tesis</span>
+                    <div className="glass-panel p-4 md:p-6 rounded-2xl flex flex-col justify-between">
+                      <span className="text-[10px] md:text-xs font-semibold text-on-surface-variant uppercase tracking-wider block">Aktif Tesis</span>
+                      <span className="text-xl md:text-3xl font-extrabold font-title text-white mt-2 block">14 Tesis</span>
                     </div>
-                    <div className="glass-panel p-6 rounded-2xl">
-                      <span className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider block">Toplam CO2 Tasarrufu</span>
-                      <span className="text-3xl font-extrabold font-title text-teal-400 mt-4 block">2.1 Ton</span>
+                    <div className="glass-panel p-4 md:p-6 rounded-2xl flex flex-col justify-between">
+                      <span className="text-[10px] md:text-xs font-semibold text-on-surface-variant uppercase tracking-wider block">Toplam CO2</span>
+                      <span className="text-xl md:text-3xl font-extrabold font-title text-teal-400 mt-2 block">2.1 Ton</span>
                     </div>
-                    <div className="glass-panel p-6 rounded-2xl">
-                      <span className="text-xs font-semibold text-on-surface-variant uppercase tracking-wider block">Toplam Karbon Vergisi Tasarrufu</span>
-                      <span className="text-3xl font-extrabold font-title text-accent-mint mt-4 block">€4,800</span>
+                    <div className="glass-panel p-4 md:p-6 rounded-2xl flex flex-col justify-between">
+                      <span className="text-[10px] md:text-xs font-semibold text-on-surface-variant uppercase tracking-wider block">Karbon Tasarrufu</span>
+                      <span className="text-xl md:text-3xl font-extrabold font-title text-accent-mint mt-2 block">€4,800</span>
                     </div>
                   </div>
 
