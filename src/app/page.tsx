@@ -60,6 +60,7 @@ export default function Home() {
   >("landing");
   const [userRole, setUserRole] = useState<"user" | "osb" | "none">("none");
   const [currentMaterialTab, setCurrentMaterialTab] = useState<"outputs" | "inputs">("outputs");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // --- MOCK DATABASE STATE ---
   const [outputs, setOutputs] = useState<OutputItem[]>([
@@ -741,46 +742,64 @@ export default function Home() {
 
       {/* ================= 2. AUTHENTICATED SYSTEM CONTAINER ================= */}
       {currentPage !== "landing" && (
-        <div className="w-full min-h-screen flex relative">
+        <div className="w-full min-h-screen flex relative overflow-x-hidden">
+          {/* Mobile Sidebar Backdrop Overlay */}
+          {sidebarOpen && (
+            <div 
+              onClick={() => setSidebarOpen(false)} 
+              className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300"
+            />
+          )}
+
           {/* Left Sidebar Navigation */}
-          <aside className="w-64 bg-slate-900 border-r border-white/5 flex flex-col justify-between fixed h-full z-30">
+          <aside className={`w-64 bg-slate-900 border-r border-white/5 flex flex-col justify-between fixed h-full z-50 transition-transform duration-300 ease-in-out lg:translate-x-0 ${
+            sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          }`}>
             <div>
-              {/* Sidebar Logo */}
-              <div className="h-20 flex items-center px-6 border-b border-white/5 gap-3">
-                <span className="material-symbols-outlined text-accent-mint text-3xl filled">recycling</span>
-                <span className="font-title text-xl font-bold tracking-tight text-white">
-                  Döngü<span className="text-accent-mint">Net</span>
-                </span>
+              {/* Sidebar Logo / Close Button */}
+              <div className="h-20 flex items-center justify-between px-6 border-b border-white/5">
+                <div className="flex items-center gap-3">
+                  <span className="material-symbols-outlined text-accent-mint text-3xl filled">recycling</span>
+                  <span className="font-title text-xl font-bold tracking-tight text-white">
+                    Döngü<span className="text-accent-mint">Net</span>
+                  </span>
+                </div>
+                <button 
+                  onClick={() => setSidebarOpen(false)} 
+                  className="lg:hidden w-8 h-8 rounded-lg bg-slate-800 border border-white/5 flex items-center justify-center text-on-surface-variant hover:text-white"
+                >
+                  <span className="material-symbols-outlined text-[18px]">close</span>
+                </button>
               </div>
               
               {/* Navigation Links */}
               <nav className="p-4 flex flex-col gap-1">
                 {userRole === "user" && (
                   <>
-                    <button onClick={() => setCurrentPage("dashboard")} className={`sidebar-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-left ${currentPage === "dashboard" ? "active" : "text-on-surface-variant hover:text-white hover:bg-white/5"}`}>
+                    <button onClick={() => { setCurrentPage("dashboard"); setSidebarOpen(false); }} className={`sidebar-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-left ${currentPage === "dashboard" ? "active" : "text-on-surface-variant hover:text-white hover:bg-white/5"}`}>
                       <span className="material-symbols-outlined text-[20px]">dashboard</span>
                       Kontrol Paneli
                     </button>
-                    <button onClick={() => setCurrentPage("materials")} className={`sidebar-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-left ${currentPage === "materials" ? "active" : "text-on-surface-variant hover:text-white hover:bg-white/5"}`}>
+                    <button onClick={() => { setCurrentPage("materials"); setSidebarOpen(false); }} className={`sidebar-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-left ${currentPage === "materials" ? "active" : "text-on-surface-variant hover:text-white hover:bg-white/5"}`}>
                       <span className="material-symbols-outlined text-[20px]">inventory_2</span>
                       Malzeme Yönetimi
                     </button>
-                    <button onClick={() => setCurrentPage("matchmaker")} className={`sidebar-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-left ${currentPage === "matchmaker" ? "active" : "text-on-surface-variant hover:text-white hover:bg-white/5"}`}>
+                    <button onClick={() => { setCurrentPage("matchmaker"); setSidebarOpen(false); }} className={`sidebar-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-left ${currentPage === "matchmaker" ? "active" : "text-on-surface-variant hover:text-white hover:bg-white/5"}`}>
                       <span className="material-symbols-outlined text-[20px]">hub</span>
                       AI Eşleştirme Paneli
                     </button>
-                    <button onClick={() => setCurrentPage("reports")} className={`sidebar-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-left ${currentPage === "reports" ? "active" : "text-on-surface-variant hover:text-white hover:bg-white/5"}`}>
+                    <button onClick={() => { setCurrentPage("reports"); setSidebarOpen(false); }} className={`sidebar-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-left ${currentPage === "reports" ? "active" : "text-on-surface-variant hover:text-white hover:bg-white/5"}`}>
                       <span className="material-symbols-outlined text-[20px]">description</span>
                       Raporlama Merkezi
                     </button>
-                    <button onClick={() => setCurrentPage("chatbot")} className={`sidebar-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-left ${currentPage === "chatbot" ? "active" : "text-on-surface-variant hover:text-white hover:bg-white/5"}`}>
+                    <button onClick={() => { setCurrentPage("chatbot"); setSidebarOpen(false); }} className={`sidebar-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-left ${currentPage === "chatbot" ? "active" : "text-on-surface-variant hover:text-white hover:bg-white/5"}`}>
                       <span className="material-symbols-outlined text-[20px]">forum</span>
                       DöngüNet AI Asistanı
                     </button>
                   </>
                 )}
                 {userRole === "osb" && (
-                  <button onClick={() => setCurrentPage("osb")} className={`sidebar-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-left ${currentPage === "osb" ? "active" : "text-on-surface-variant hover:text-white hover:bg-white/5"}`}>
+                  <button onClick={() => { setCurrentPage("osb"); setSidebarOpen(false); }} className={`sidebar-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-left ${currentPage === "osb" ? "active" : "text-on-surface-variant hover:text-white hover:bg-white/5"}`}>
                     <span className="material-symbols-outlined text-[20px]">domain</span>
                     OSB Yönetici Paneli
                   </button>
@@ -811,11 +830,17 @@ export default function Home() {
           </aside>
 
           {/* Right Main Content */}
-          <div className="flex-grow pl-64 flex flex-col min-h-screen">
+          <div className="flex-grow pl-0 lg:pl-64 flex flex-col min-h-screen w-full min-w-0">
             {/* Header */}
-            <header className="h-20 border-b border-white/5 bg-slate-900/60 backdrop-blur flex justify-between items-center px-8 sticky top-0 z-20">
-              <div className="flex items-center gap-4">
-                <h2 className="font-title text-xl font-bold text-white">
+            <header className="h-20 border-b border-white/5 bg-slate-900/60 backdrop-blur flex justify-between items-center px-4 md:px-8 sticky top-0 z-20">
+              <div className="flex items-center gap-2 md:gap-4 min-w-0">
+                <button 
+                  onClick={() => setSidebarOpen(true)} 
+                  className="lg:hidden w-10 h-10 rounded-xl bg-slate-800 border border-white/5 flex items-center justify-center text-on-surface-variant hover:text-white mr-1 shrink-0"
+                >
+                  <span className="material-symbols-outlined text-[20px]">menu</span>
+                </button>
+                <h2 className="font-title text-base md:text-xl font-bold text-white truncate">
                   {currentPage === "dashboard" && "Kontrol Paneli"}
                   {currentPage === "materials" && "Malzeme Yönetimi"}
                   {currentPage === "matchmaker" && "AI Eşleştirme Paneli"}
@@ -823,20 +848,20 @@ export default function Home() {
                   {currentPage === "chatbot" && "DöngüNet AI Asistanı"}
                   {currentPage === "osb" && "OSB Yönetici Paneli"}
                 </h2>
-                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                <span className={`px-2 py-0.5 rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-wider border shrink-0 ${
                   userRole === "osb" 
                     ? "bg-teal-400/10 text-teal-400 border-teal-400/20" 
                     : "bg-accent-mint/10 text-accent-mint border-accent-mint/20"
                 }`}>
-                  {userRole === "osb" ? "OSB YÖNETİCİ" : "TESİS"}
+                  {userRole === "osb" ? "OSB" : "TESİS"}
                 </span>
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 md:gap-4 shrink-0">
                 <button className="w-10 h-10 rounded-xl bg-slate-800 border border-white/5 flex items-center justify-center text-on-surface-variant hover:text-white transition-colors relative">
                   <span className="material-symbols-outlined text-[20px]">notifications</span>
                   <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-accent-mint"></span>
                 </button>
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800 border border-white/5">
+                <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800 border border-white/5">
                   <span className="w-2 h-2 rounded-full bg-accent-mint animate-pulse"></span>
                   <span className="text-xs font-semibold text-white">Bağlı (Simüle)</span>
                 </div>
@@ -844,7 +869,7 @@ export default function Home() {
             </header>
 
             {/* View Panels */}
-            <main className="flex-grow p-8 bg-slate-950 relative overflow-y-auto">
+            <main className="flex-grow p-4 md:p-8 bg-slate-950 relative overflow-y-auto">
 
               {/* 2.1 DASHBOARD VIEW */}
               {currentPage === "dashboard" && (
