@@ -1,0 +1,114 @@
+"use client";
+
+import React from "react";
+import styles from "./LandingView.module.css";
+
+interface LandingViewProps {
+  onLogin: (role: "user" | "osb") => void;
+}
+
+export default function LandingView({ onLogin }: LandingViewProps) {
+  return (
+    <div className={styles.container}>
+      {/* Top Navigation */}
+      <header className={styles.header}>
+        <div className="flex items-center gap-3">
+          <span className="material-symbols-outlined text-accent-mint text-3xl filled">recycling</span>
+          <span className="font-title text-2xl font-bold tracking-tight text-white flex items-center gap-1.5">
+            Döngü<span className="text-accent-mint">Net</span>
+          </span>
+        </div>
+        <div className="flex items-center gap-6">
+          <a className="text-on-surface-variant hover:text-accent-mint transition-colors duration-200 text-sm font-medium hidden md:block" href="#capabilities">
+            Yetenekler
+          </a>
+          <button onClick={() => onLogin("user")} className="btn-secondary px-6 py-2.5 rounded-full text-sm font-medium cursor-pointer">
+            Giriş Yap
+          </button>
+        </div>
+      </header>
+
+      <main className="flex-grow pt-20">
+        {/* Ticker */}
+        <div className={styles.tickerContainer}>
+          <div className="ticker-content flex gap-8 sm:gap-16 text-accent-mint text-[10px] sm:text-xs font-semibold uppercase tracking-widest whitespace-nowrap">
+            <span className="flex items-center shrink-0 whitespace-nowrap">
+              <span className="material-symbols-outlined align-middle mr-2 text-[16px] sm:text-[18px]">recycling</span> 1,240 Ton Atık Geri Kazandırıldı
+            </span>
+            <span className="text-slate-700 shrink-0">•</span>
+            <span className="flex items-center shrink-0 whitespace-nowrap">
+              <span className="material-symbols-outlined align-middle mr-2 text-[16px] sm:text-[18px]">co2</span> 450 Ton CO2 Azaltımı Sağlandı
+            </span>
+            <span className="text-slate-700 shrink-0">•</span>
+            <span className="flex items-center shrink-0 whitespace-nowrap">
+              <span className="material-symbols-outlined align-middle mr-2 text-[16px] sm:text-[18px]">payments</span> €150,000 SKDM Karbon Vergisi Tasarrufu
+            </span>
+            <span className="text-slate-700 shrink-0">•</span>
+            {/* Duplicate for loop */}
+            <span className="flex items-center shrink-0 whitespace-nowrap">
+              <span className="material-symbols-outlined align-middle mr-2 text-[16px] sm:text-[18px]">recycling</span> 1,240 Ton Atık Geri Kazandırıldı
+            </span>
+            <span className="text-slate-700 shrink-0">•</span>
+            <span className="flex items-center shrink-0 whitespace-nowrap">
+              <span className="material-symbols-outlined align-middle mr-2 text-[16px] sm:text-[18px]">co2</span> 450 Ton CO2 Azaltımı Sağlandı
+            </span>
+          </div>
+        </div>
+
+        {/* Hero Section */}
+        <section className={styles.heroSection}>
+          <div className={styles.heroGlow}></div>
+
+          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10 w-full items-center mt-6 md:mt-12">
+            <div className="lg:col-span-7 flex flex-col items-start gap-6">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800 border border-white/5 text-accent-mint text-xs font-semibold uppercase tracking-widest">
+                <span className="w-2 h-2 rounded-full bg-accent-mint animate-pulse"></span>
+                Yapay Zeka Destekli Kaynak Optimizasyonu
+              </div>
+              <h1 className="font-title text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight">
+                DöngüNet: Akıllı<br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-mint to-teal-400">Endüstriyel Simbiyoz</span> Platformu
+              </h1>
+              <p className="text-base md:text-lg text-on-surface-variant max-w-2xl leading-relaxed">
+                Endüstriyel atık ve yan ürünlerinizi katma değerli kaynaklara dönüştürün. Tesisleri eşleştirin, lojistiği optimize edin ve AB yeşil mutabakat (ESPR/SKDM) uyumluluğunu otomatikleştirin.
+              </p>
+              <button onClick={() => onLogin("user")} className="btn-primary px-8 py-4 rounded-xl font-semibold text-base flex items-center justify-center gap-2 cursor-pointer">
+                Tesis Olarak Başla
+                <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+              </button>
+            </div>
+
+            <div className="lg:col-span-5 flex flex-col gap-4 w-full max-w-md mx-auto lg:mx-0 mt-8 lg:mt-0">
+              <p className="text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-1 pl-1">Hızlı Erişim Rol Seçimi</p>
+              <div onClick={() => onLogin("user")} className={`${styles.card} glass-panel p-6 rounded-2xl flex items-center justify-between group cursor-pointer transition-all duration-300`}>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center border border-white/5 group-hover:border-accent-mint/30 transition-colors">
+                    <span className="material-symbols-outlined text-accent-mint text-2xl">factory</span>
+                  </div>
+                  <div>
+                    <h3 className="font-title text-lg font-bold text-white group-hover:text-accent-mint transition-colors">Tesis / Fabrika Paneli</h3>
+                    <p className="text-xs text-on-surface-variant mt-0.5">Atık listeleme, girdi arama ve eşleştirme</p>
+                  </div>
+                </div>
+                <span className={`material-symbols-outlined text-on-surface-variant group-hover:text-accent-mint ${styles.chevronIcon}`}>chevron_right</span>
+              </div>
+
+              <div onClick={() => onLogin("osb")} className={`${styles.card} glass-panel p-6 rounded-2xl flex items-center justify-between group cursor-pointer transition-all duration-300`}>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center border border-white/5 group-hover:border-teal-400/30 transition-colors">
+                    <span className="material-symbols-outlined text-teal-400 text-2xl">domain</span>
+                  </div>
+                  <div>
+                    <h3 className="font-title text-lg font-bold text-white group-hover:text-teal-400 transition-colors">OSB Yönetim Paneli</h3>
+                    <p className="text-xs text-on-surface-variant mt-0.5">Bölgesel döngüsellik ve toplu analiz takibi</p>
+                  </div>
+                </div>
+                <span className={`material-symbols-outlined text-on-surface-variant group-hover:text-teal-400 ${styles.chevronIcon}`}>chevron_right</span>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}

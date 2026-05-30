@@ -1,0 +1,122 @@
+"use client";
+
+import React from "react";
+import styles from "./Modal.module.css";
+import { OutputItem } from "../../types";
+
+interface DppModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  output: OutputItem | null;
+}
+
+export default function DppModal({ isOpen, onClose, output }: DppModalProps) {
+  if (!isOpen || !output) return null;
+
+  const handlePdfDownload = (name: string) => {
+    alert(`${name}.pdf simüle edilmiş şekilde derleniyor ve indirme kuyruğuna alınıyor.`);
+  };
+
+  // --- SVG QR CODE GENERATION ---
+  const drawMockSvgQrCode = () => {
+    return (
+      <svg viewBox="0 0 100 100" className="w-full h-full text-slate-900" fill="currentColor">
+        <rect x="5" y="5" width="25" height="25" />
+        <rect x="10" y="10" width="15" height="15" fill="white" />
+        <rect x="15" y="15" width="5" height="5" />
+
+        <rect x="70" y="5" width="25" height="25" />
+        <rect x="75" y="10" width="15" height="15" fill="white" />
+        <rect x="80" y="15" width="5" height="5" />
+
+        <rect x="5" y="70" width="25" height="25" />
+        <rect x="10" y="75" width="15" height="15" fill="white" />
+        <rect x="15" y="80" width="5" height="5" />
+
+        <rect x="75" y="75" width="10" height="10" />
+        <rect x="78" y="78" width="4" height="4" fill="white" />
+
+        <rect x="35" y="12" width="4" height="4" />
+        <rect x="42" y="25" width="4" height="4" />
+        <rect x="55" y="50" width="4" height="4" />
+        <rect x="62" y="70" width="4" height="4" />
+        <rect x="38" y="82" width="4" height="4" />
+        <rect x="45" y="44" width="4" height="4" />
+        <rect x="52" y="15" width="4" height="4" />
+        <rect x="58" y="32" width="4" height="4" />
+        <rect x="66" y="88" width="4" height="4" />
+        <rect x="12" y="48" width="4" height="4" />
+        <rect x="25" y="55" width="4" height="4" />
+        <rect x="30" y="38" width="4" height="4" />
+        <rect x="22" y="42" width="4" height="4" />
+        <rect x="48" y="68" width="4" height="4" />
+        <rect x="72" y="45" width="4" height="4" />
+        <rect x="88" y="38" width="4" height="4" />
+        <rect x="84" y="52" width="4" height="4" />
+        <rect x="92" y="65" width="4" height="4" />
+      </svg>
+    );
+  };
+
+  return (
+    <div className={styles.backdrop}>
+      <div className={`${styles.modalContent} ${styles.modalContentWide} glass-panel`}>
+        <div className="flex justify-between items-center border-b border-white/5 pb-4">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-accent-mint">qr_code_2</span>
+            <h3 className="font-title font-bold text-lg text-white">Dijital Ürün Pasaportu (DPP)</h3>
+          </div>
+          <button onClick={onClose} className="text-on-surface-variant hover:text-white cursor-pointer">
+            <span className="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+          <div className="md:col-span-8 flex flex-col gap-4">
+            <div>
+              <h4 className="font-title text-base font-bold text-white">{output.name}</h4>
+              <span className="text-[10px] bg-teal-500/10 text-teal-400 px-2 py-0.5 rounded font-bold uppercase border border-teal-500/20">
+                AB ESPR 2026 Uyumlu
+              </span>
+            </div>
+            <div className="grid grid-cols-2 gap-4 text-xs">
+              <div className="p-3 bg-slate-900/40 rounded-xl border border-white/5">
+                <span className="text-[10px] text-on-surface-variant uppercase block">Pasaport ID</span>
+                <span className="font-mono text-white mt-1 block">{output.dppId}</span>
+              </div>
+              <div className="p-3 bg-slate-900/40 rounded-xl border border-white/5">
+                <span className="text-[10px] text-on-surface-variant uppercase block">Bileşim</span>
+                <span className="text-white mt-1 block">{output.composition}</span>
+              </div>
+              <div className="p-3 bg-slate-900/40 rounded-xl border border-white/5">
+                <span className="text-[10px] text-on-surface-variant uppercase block">Menşe</span>
+                <span className="text-white mt-1 block">Dilovası OSB, Türkiye</span>
+              </div>
+              <div className="p-3 bg-slate-900/40 rounded-xl border border-white/5">
+                <span className="text-[10px] text-on-surface-variant uppercase block">Karbon Yoğunluğu</span>
+                <span className="text-teal-400 mt-1 block">0.32 kg CO2 / kg</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="md:col-span-4 flex flex-col items-center justify-center p-4 bg-white rounded-2xl aspect-square w-full max-w-[180px] mx-auto">
+            <div className="w-full h-full text-slate-950">{drawMockSvgQrCode()}</div>
+          </div>
+        </div>
+
+        <div className="flex gap-4 border-t border-white/5 pt-6">
+          <button
+            onClick={() => handlePdfDownload("Dijital Urun Pasaportu")}
+            className="btn-primary flex-grow py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-[18px]">download_for_offline</span>
+            Pasaport Raporunu İndir (PDF)
+          </button>
+          <button onClick={onClose} className="btn-secondary px-6 py-3 rounded-xl text-xs font-bold cursor-pointer">
+            Kapat
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
