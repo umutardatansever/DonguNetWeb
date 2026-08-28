@@ -11,7 +11,7 @@ export default function ReportsView() {
   return (
     <div className={styles.container}>
       <div className="glass-panel p-6 rounded-2xl">
-        <h3 className="font-title font-bold text-white text-base">Raporlama ve Uyumluluk</h3>
+        <h3 className="font-title font-bold text-on-surface text-base">Raporlama ve Uyumluluk</h3>
         <p className="text-xs text-on-surface-variant mt-1">
           Eşleşmeleriniz sonucu sağlanan emisyon azaltımlarını içeren yasal belgeler ve AB uyumluluk dosyaları.
         </p>
@@ -20,8 +20,8 @@ export default function ReportsView() {
       <div className={styles.grid}>
         <div className="glass-panel p-6 rounded-2xl flex flex-col justify-between gap-6 relative overflow-hidden">
           <div className="flex flex-col gap-3">
-            <span className="material-symbols-outlined text-teal-400 text-3xl">co2</span>
-            <h4 className="font-title font-bold text-lg text-white">Çevresel Etki Raporu</h4>
+            <span className="material-symbols-outlined text-teal-700 text-3xl">co2</span>
+            <h4 className="font-title font-bold text-lg text-on-surface">Çevresel Etki Raporu</h4>
             <p className="text-xs text-on-surface-variant">
               ISO 14040 Life Cycle Assessment (LCA) uyumlu, net karbon azaltımlarını beyan eden detaylı emisyon raporu.
             </p>
@@ -37,8 +37,8 @@ export default function ReportsView() {
 
         <div className="glass-panel p-6 rounded-2xl flex flex-col justify-between gap-6 relative overflow-hidden">
           <div className="flex flex-col gap-3">
-            <span className="material-symbols-outlined text-orange-400 text-3xl">gavel</span>
-            <h4 className="font-title font-bold text-lg text-white">SKDM (CBAM) Uyum Beyanı</h4>
+            <span className="material-symbols-outlined text-secondary text-3xl">gavel</span>
+            <h4 className="font-title font-bold text-lg text-on-surface">SKDM (CBAM) Uyum Beyanı</h4>
             <p className="text-xs text-on-surface-variant">
               Sınırda Karbon Düzenleme Mekanizması kurallarına uygun, ithalat/ihracat vergi muafiyeti bildirim belgesi.
             </p>
@@ -55,7 +55,7 @@ export default function ReportsView() {
         <div className="glass-panel p-6 rounded-2xl flex flex-col justify-between gap-6 relative overflow-hidden">
           <div className="flex flex-col gap-3">
             <span className="material-symbols-outlined text-accent-mint text-3xl">qr_code</span>
-            <h4 className="font-title font-bold text-lg text-white">Dijital Pasaport Raporu</h4>
+            <h4 className="font-title font-bold text-lg text-on-surface">Dijital Pasaport Raporu</h4>
             <p className="text-xs text-on-surface-variant">
               AB ESPR yönetmeliklerine uygun, malzemenin kimyasal, fiziksel ve izlenebilirlik pasaport özeti.
             </p>

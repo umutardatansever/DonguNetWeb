@@ -69,7 +69,7 @@ export default function AuthModal({ isOpen, role, onClose, onAuthComplete }: Aut
       <div className={`${styles.modalContent} glass-panel`}>
         <div className="flex justify-between items-center">
           <div>
-            <h3 className="font-title font-bold text-lg text-white">
+            <h3 className="font-title font-bold text-lg text-on-surface">
               {mode === "login" && "Giriş Yap"}
               {mode === "register" && "Yeni Tesis Kaydı"}
               {mode === "forgot" && "Şifre Sıfırla"}
@@ -77,7 +77,7 @@ export default function AuthModal({ isOpen, role, onClose, onAuthComplete }: Aut
             </h3>
             <p className="text-[10px] text-on-surface-variant mt-0.5">{roleLabel}</p>
           </div>
-          <button onClick={resetAndClose} className="text-on-surface-variant hover:text-white cursor-pointer">
+          <button onClick={resetAndClose} className="text-on-surface-variant hover:text-on-surface cursor-pointer">
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
@@ -90,7 +90,7 @@ export default function AuthModal({ isOpen, role, onClose, onAuthComplete }: Aut
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 type="email"
-                className="bg-slate-900 border border-white/10 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-accent-mint"
+                className="bg-surface border border-border-color rounded-xl p-3 text-sm text-on-surface focus:outline-none focus:border-accent-mint"
                 placeholder="tesis@ornek.com"
               />
             </div>
@@ -100,11 +100,11 @@ export default function AuthModal({ isOpen, role, onClose, onAuthComplete }: Aut
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 type="password"
-                className="bg-slate-900 border border-white/10 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-accent-mint"
+                className="bg-surface border border-border-color rounded-xl p-3 text-sm text-on-surface focus:outline-none focus:border-accent-mint"
                 placeholder="••••••••"
               />
             </div>
-            {error && <p className="text-xs text-rose-400">{error}</p>}
+            {error && <p className="text-xs text-rose-600">{error}</p>}
             <button type="submit" className="btn-primary w-full py-3.5 rounded-xl font-bold text-sm cursor-pointer">
               Giriş Yap
             </button>
@@ -143,7 +143,7 @@ export default function AuthModal({ isOpen, role, onClose, onAuthComplete }: Aut
                 value={facilityName}
                 onChange={(e) => setFacilityName(e.target.value)}
                 type="text"
-                className="bg-slate-900 border border-white/10 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-accent-mint"
+                className="bg-surface border border-border-color rounded-xl p-3 text-sm text-on-surface focus:outline-none focus:border-accent-mint"
                 placeholder="Örn: Gebze Metal A.Ş."
               />
             </div>
@@ -153,7 +153,7 @@ export default function AuthModal({ isOpen, role, onClose, onAuthComplete }: Aut
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 type="email"
-                className="bg-slate-900 border border-white/10 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-accent-mint"
+                className="bg-surface border border-border-color rounded-xl p-3 text-sm text-on-surface focus:outline-none focus:border-accent-mint"
                 placeholder="tesis@ornek.com"
               />
             </div>
@@ -163,11 +163,11 @@ export default function AuthModal({ isOpen, role, onClose, onAuthComplete }: Aut
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 type="password"
-                className="bg-slate-900 border border-white/10 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-accent-mint"
+                className="bg-surface border border-border-color rounded-xl p-3 text-sm text-on-surface focus:outline-none focus:border-accent-mint"
                 placeholder="••••••••"
               />
             </div>
-            {error && <p className="text-xs text-rose-400">{error}</p>}
+            {error && <p className="text-xs text-rose-600">{error}</p>}
             <button type="submit" className="btn-primary w-full py-3.5 rounded-xl font-bold text-sm cursor-pointer">
               Kaydı Tamamla
             </button>
@@ -195,11 +195,11 @@ export default function AuthModal({ isOpen, role, onClose, onAuthComplete }: Aut
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 type="email"
-                className="bg-slate-900 border border-white/10 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-accent-mint"
+                className="bg-surface border border-border-color rounded-xl p-3 text-sm text-on-surface focus:outline-none focus:border-accent-mint"
                 placeholder="tesis@ornek.com"
               />
             </div>
-            {error && <p className="text-xs text-rose-400">{error}</p>}
+            {error && <p className="text-xs text-rose-600">{error}</p>}
             <button type="submit" className="btn-primary w-full py-3.5 rounded-xl font-bold text-sm cursor-pointer">
               Sıfırlama Bağlantısı Gönder
             </button>
@@ -221,7 +221,7 @@ export default function AuthModal({ isOpen, role, onClose, onAuthComplete }: Aut
             <div className="w-16 h-16 rounded-2xl bg-accent-mint/10 border border-accent-mint/20 flex items-center justify-center">
               <span className="material-symbols-outlined text-accent-mint text-3xl">mark_email_read</span>
             </div>
-            <p className="text-sm text-white font-semibold">Doğrulama e-postası gönderildi</p>
+            <p className="text-sm text-on-surface font-semibold">Doğrulama e-postası gönderildi</p>
             <p className="text-xs text-on-surface-variant">
               <span className="text-accent-mint">{email || "e-posta adresinize"}</span> gönderilen bağlantıya tıklayarak
               hesabınızı doğrulayın (bu adım simüle edilmiştir).

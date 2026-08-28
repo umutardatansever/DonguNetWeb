@@ -56,7 +56,7 @@ export default function MatchmakerView({
     ctx.clearRect(0, 0, width, height);
 
     // Draw polygons
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.05)";
+    ctx.strokeStyle = "rgba(29, 36, 32, 0.1)";
     ctx.lineWidth = 1;
     for (let level = 1; level <= 5; level++) {
       const curRadius = radius * (level / 5);
@@ -73,7 +73,7 @@ export default function MatchmakerView({
     }
 
     // Axes and Labels
-    ctx.fillStyle = "#94a3b8";
+    ctx.fillStyle = "#666f63";
     ctx.font = "bold 9px Inter, sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -105,9 +105,9 @@ export default function MatchmakerView({
       else ctx.lineTo(x, y);
     }
     ctx.closePath();
-    ctx.fillStyle = "rgba(16, 185, 129, 0.25)";
+    ctx.fillStyle = "rgba(30, 95, 70, 0.2)";
     ctx.fill();
-    ctx.strokeStyle = "#10b981";
+    ctx.strokeStyle = "#1e5f46";
     ctx.lineWidth = 2;
     ctx.stroke();
 
@@ -120,9 +120,9 @@ export default function MatchmakerView({
 
       ctx.beginPath();
       ctx.arc(x, y, 3, 0, 2 * Math.PI);
-      ctx.fillStyle = "#ffffff";
+      ctx.fillStyle = "#fffdf8";
       ctx.fill();
-      ctx.strokeStyle = "#059669";
+      ctx.strokeStyle = "#1e5f46";
       ctx.lineWidth = 1.5;
       ctx.stroke();
     }
@@ -154,32 +154,32 @@ export default function MatchmakerView({
     const pathD = `M ${startX} ${startY} Q ${midX} ${midY} ${destX} ${destY}`;
 
     return (
-      <svg viewBox="0 0 500 200" className="w-full h-full text-slate-800" fill="currentColor">
+      <svg viewBox="0 0 500 200" className="w-full h-full text-on-surface-variant" fill="currentColor">
         <defs>
           <pattern id="map-grid" width="20" height="20" patternUnits="userSpaceOnUse">
-            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth={1} />
+            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(29,36,32,0.06)" strokeWidth={1} />
           </pattern>
         </defs>
         <rect width="100%" height="100%" fill="url(#map-grid)" />
-        <path d="M 0 160 Q 180 180 250 140 T 500 170 L 500 200 L 0 200 Z" fill="rgba(13, 148, 136, 0.05)" />
-        <path d={pathD} fill="none" stroke="#059669" strokeWidth={2} strokeDasharray="6 4" />
-        <circle r={5} fill="#10b981">
+        <path d="M 0 160 Q 180 180 250 140 T 500 170 L 500 200 L 0 200 Z" fill="rgba(15, 122, 108, 0.06)" />
+        <path d={pathD} fill="none" stroke="#1e5f46" strokeWidth={2} strokeDasharray="6 4" />
+        <circle r={5} fill="#1e5f46">
           <animateMotion dur="4s" repeatCount="indefinite" path={pathD} />
         </circle>
-        <circle cx={startX} cy={startY} r={6} fill="#059669" />
-        <circle cx={startX} cy={startY} r={15} fill="none" stroke="#059669" strokeWidth={1.5}>
+        <circle cx={startX} cy={startY} r={6} fill="#1e5f46" />
+        <circle cx={startX} cy={startY} r={15} fill="none" stroke="#1e5f46" strokeWidth={1.5}>
           <animate attributeName="r" values="6;16;6" dur="2.5s" repeatCount="indefinite" />
           <animate attributeName="opacity" values="1;0;1" dur="2.5s" repeatCount="indefinite" />
         </circle>
-        <text x={startX - 15} y={startY - 22} fill="#94a3b8" fontSize="9" fontWeight="bold">
+        <text x={startX - 15} y={startY - 22} fill="#666f63" fontSize="9" fontWeight="bold">
           Gebze Metal (A)
         </text>
-        <circle cx={destX} cy={destY} r={6} fill="#0d9488" />
-        <circle cx={destX} cy={destY} r={15} fill="none" stroke="#0d9488" strokeWidth={1.5}>
+        <circle cx={destX} cy={destY} r={6} fill="#0f7a6c" />
+        <circle cx={destX} cy={destY} r={15} fill="none" stroke="#0f7a6c" strokeWidth={1.5}>
           <animate attributeName="r" values="6;16;6" dur="2.5s" repeatCount="indefinite" />
           <animate attributeName="opacity" values="1;0;1" dur="2.5s" repeatCount="indefinite" />
         </circle>
-        <text x={destX - 35} y={destY - 22} fill="#94a3b8" fontSize="9" fontWeight="bold">
+        <text x={destX - 35} y={destY - 22} fill="#666f63" fontSize="9" fontWeight="bold">
           {match.name.split(" (")[0]}
         </text>
       </svg>
@@ -226,11 +226,11 @@ export default function MatchmakerView({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex gap-2 p-1 rounded-xl bg-slate-900 border border-white/5 self-start">
+      <div className="flex gap-2 p-1 rounded-xl bg-surface-light border border-border-color self-start">
         <button
           onClick={() => setViewMode("board")}
           className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-            viewMode === "board" ? "text-white bg-slate-700" : "text-on-surface-variant hover:text-white"
+            viewMode === "board" ? "text-white bg-primary shadow-sm" : "text-on-surface-variant hover:text-on-surface"
           }`}
         >
           Eşleştirme Panosu
@@ -238,7 +238,7 @@ export default function MatchmakerView({
         <button
           onClick={() => setViewMode("history")}
           className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-            viewMode === "history" ? "text-white bg-slate-700" : "text-on-surface-variant hover:text-white"
+            viewMode === "history" ? "text-white bg-primary shadow-sm" : "text-on-surface-variant hover:text-on-surface"
           }`}
         >
           Eşleştirme Geçmişi
@@ -247,12 +247,12 @@ export default function MatchmakerView({
 
       {viewMode === "history" ? (
         <div className="glass-panel rounded-2xl overflow-hidden">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 border-b border-white/5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 border-b border-border-color">
             <div className="flex gap-3">
               <select
                 value={historyFilter}
                 onChange={(e) => setHistoryFilter(e.target.value as typeof historyFilter)}
-                className="bg-slate-900 border border-white/10 rounded-lg text-xs px-3 py-2 text-white focus:outline-none focus:border-accent-mint"
+                className="bg-surface border border-border-color rounded-lg text-xs px-3 py-2 text-on-surface focus:outline-none focus:border-accent-mint"
               >
                 <option value="all">Tüm Durumlar</option>
                 <option value="accepted">Kabul Edildi</option>
@@ -262,7 +262,7 @@ export default function MatchmakerView({
               <select
                 value={historySort}
                 onChange={(e) => setHistorySort(e.target.value as typeof historySort)}
-                className="bg-slate-900 border border-white/10 rounded-lg text-xs px-3 py-2 text-white focus:outline-none focus:border-accent-mint"
+                className="bg-surface border border-border-color rounded-lg text-xs px-3 py-2 text-on-surface focus:outline-none focus:border-accent-mint"
               >
                 <option value="date_desc">Tarih (Yeni → Eski)</option>
                 <option value="date_asc">Tarih (Eski → Yeni)</option>
@@ -282,7 +282,7 @@ export default function MatchmakerView({
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="text-[10px] font-bold text-on-surface-variant uppercase bg-slate-900/40">
+                <tr className="text-[10px] font-bold text-on-surface-variant uppercase bg-surface-light/60">
                   <th className="px-5 py-3">Tesis</th>
                   <th className="px-5 py-3">Tarih</th>
                   <th className="px-5 py-3">Skor</th>
@@ -291,13 +291,13 @@ export default function MatchmakerView({
                   <th className="px-5 py-3 text-right">Durum</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5 text-sm text-white">
+              <tbody className="divide-y divide-border-color text-sm text-on-surface">
                 {historyRows.map((m) => (
                   <tr key={m.id}>
                     <td className="px-5 py-3 font-semibold">{m.name}</td>
                     <td className="px-5 py-3 text-on-surface-variant text-xs">{m.date}</td>
                     <td className="px-5 py-3 text-accent-mint font-bold">{m.score}%</td>
-                    <td className="px-5 py-3 text-xs text-teal-400">{m.co2} kg</td>
+                    <td className="px-5 py-3 text-xs text-teal-700">{m.co2} kg</td>
                     <td className="px-5 py-3 text-xs text-accent-mint">€{m.savings.toLocaleString()}</td>
                     <td className="px-5 py-3 text-right">
                       <span
@@ -305,8 +305,8 @@ export default function MatchmakerView({
                           m.status === "accepted"
                             ? "bg-accent-mint/10 text-accent-mint border-accent-mint/20"
                             : m.status === "rejected"
-                            ? "bg-rose-500/10 text-rose-400 border-rose-500/20"
-                            : "bg-sky-500/10 text-sky-400 border-sky-500/20"
+                            ? "bg-rose-500/10 text-rose-600 border-rose-500/20"
+                            : "bg-sky-500/10 text-sky-700 border-sky-500/20"
                         }`}
                       >
                         {statusLabel(m.status)}
@@ -330,7 +330,7 @@ export default function MatchmakerView({
           {/* Left Column: Candidates */}
           <div className="lg:col-span-5 flex flex-col gap-4">
         <div className="glass-panel p-5 rounded-2xl">
-          <h3 className="font-title font-bold text-white text-base">Eşleştirme Adayları</h3>
+          <h3 className="font-title font-bold text-on-surface text-base">Eşleştirme Adayları</h3>
           <p className="text-xs text-on-surface-variant mt-1">
             Seçili Alüminyum Alaşımlı Toz için pgvector ile eşleşen tesisler listelenmektedir (Kosinüs Benzerliği &gt;= 0.65)
           </p>
@@ -353,13 +353,13 @@ export default function MatchmakerView({
             >
               <div className="flex justify-between items-start">
                 <div>
-                  <h4 className="font-title font-bold text-white text-sm">{m.name}</h4>
+                  <h4 className="font-title font-bold text-on-surface text-sm">{m.name}</h4>
                   <span className="text-[10px] text-on-surface-variant block mt-1">Lojistik Mesafe: {m.distance} km</span>
                 </div>
                 <span className="text-base font-extrabold font-title text-accent-mint">{m.score}% Uyum</span>
               </div>
-              <div className="flex justify-between items-center border-t border-white/5 pt-2 text-[10px]">
-                <span className="text-teal-400 flex items-center gap-1">
+              <div className="flex justify-between items-center border-t border-border-color pt-2 text-[10px]">
+                <span className="text-teal-700 flex items-center gap-1">
                   <span className="material-symbols-outlined text-[12px]">eco</span>
                   {m.co2} kg CO2 Tasarrufu
                 </span>
@@ -368,10 +368,10 @@ export default function MatchmakerView({
                     m.status === "accepted"
                       ? "bg-accent-mint/10 text-accent-mint border-accent-mint/20"
                       : m.status === "rejected"
-                      ? "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                      ? "bg-rose-500/10 text-rose-600 border-rose-500/20"
                       : m.status === "completed"
-                      ? "bg-sky-500/10 text-sky-400 border-sky-500/20"
-                      : "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                      ? "bg-sky-500/10 text-sky-700 border-sky-500/20"
+                      : "bg-amber-500/10 text-amber-700 border-amber-500/20"
                   }`}
                 >
                   {statusLabel(m.status)}
@@ -385,9 +385,9 @@ export default function MatchmakerView({
       {/* Right Column: Selected Detail */}
       <div id="matchmaker-detail" className="lg:col-span-7 flex flex-col gap-6 scroll-mt-24">
         <div className="glass-panel p-6 rounded-2xl flex flex-col gap-6">
-          <div className="flex justify-between items-start border-b border-white/5 pb-4">
+          <div className="flex justify-between items-start border-b border-border-color pb-4">
             <div>
-              <h3 className="font-title font-bold text-lg text-white">{selectedMatch.name}</h3>
+              <h3 className="font-title font-bold text-lg text-on-surface">{selectedMatch.name}</h3>
               <p className="text-xs text-on-surface-variant mt-0.5">Eşleşen Girdi İhtiyacı: Alüminyum Tozu</p>
             </div>
             <div className="flex flex-col items-end">
@@ -398,30 +398,30 @@ export default function MatchmakerView({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="flex flex-col gap-3">
-              <h4 className="text-xs font-bold text-white uppercase tracking-wider">5 Faktörlü Uyum Kırılımı</h4>
+              <h4 className="text-xs font-bold text-on-surface uppercase tracking-wider">5 Faktörlü Uyum Kırılımı</h4>
               <div className={styles.radarCanvasWrapper}>
                 <canvas ref={radarCanvasRef} className={styles.radarCanvas}></canvas>
               </div>
             </div>
 
             <div className="flex flex-col gap-3">
-              <h4 className="text-xs font-bold text-white uppercase tracking-wider">Lojistik Rota Simülasyonu</h4>
+              <h4 className="text-xs font-bold text-on-surface uppercase tracking-wider">Lojistik Rota Simülasyonu</h4>
               <div className={styles.routeMapWrapper}>{renderRouteSvgMap(selectedMatch)}</div>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 rounded-xl bg-slate-900/40 border border-white/5">
+            <div className="p-4 rounded-xl bg-surface-light/60 border border-border-color">
               <span className="text-[10px] text-on-surface-variant font-bold uppercase tracking-wider block">
                 Lojistik Mesafe
               </span>
-              <span className="text-lg font-bold text-white mt-1 block">{selectedMatch.distance} km</span>
+              <span className="text-lg font-bold text-on-surface mt-1 block">{selectedMatch.distance} km</span>
             </div>
-            <div className="p-4 rounded-xl bg-teal-500/5 border border-teal-500/10">
-              <span className="text-[10px] text-teal-400 font-bold uppercase tracking-wider block">
+            <div className="p-4 rounded-xl bg-teal-600/5 border border-teal-600/15">
+              <span className="text-[10px] text-teal-700 font-bold uppercase tracking-wider block">
                 CO2 Azaltımı (Net)
               </span>
-              <span className="text-lg font-bold text-teal-400 mt-1 block">{selectedMatch.co2} kg CO2</span>
+              <span className="text-lg font-bold text-teal-700 mt-1 block">{selectedMatch.co2} kg CO2</span>
             </div>
             <div className="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
               <span className="text-[10px] text-accent-mint font-bold uppercase tracking-wider block">
@@ -434,7 +434,7 @@ export default function MatchmakerView({
           </div>
 
           {/* Actions */}
-          <div className="flex gap-4 border-t border-white/5 pt-6">
+          <div className="flex gap-4 border-t border-border-color pt-6">
             <button
               onClick={onAcceptMatch}
               className="flex-grow btn-primary py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 cursor-pointer"
@@ -444,7 +444,7 @@ export default function MatchmakerView({
             </button>
             <button
               onClick={() => setRejectPanelOpen(true)}
-              className="px-6 py-3.5 rounded-xl font-bold text-sm text-rose-400 bg-rose-500/5 border border-rose-500/10 hover:bg-rose-500/10 transition-colors cursor-pointer"
+              className="px-6 py-3.5 rounded-xl font-bold text-sm text-rose-600 bg-rose-500/5 border border-rose-500/15 hover:bg-rose-500/10 transition-colors cursor-pointer"
             >
               Reddet
             </button>
@@ -452,25 +452,25 @@ export default function MatchmakerView({
 
           {/* Inline Rejection Panel */}
           {rejectPanelOpen && (
-            <div className="border-t border-white/5 pt-4 flex flex-col gap-3">
-              <label className="text-xs font-bold text-white uppercase tracking-wider">Red Gerekçesi Belirtiniz</label>
+            <div className="border-t border-border-color pt-4 flex flex-col gap-3">
+              <label className="text-xs font-bold text-on-surface uppercase tracking-wider">Red Gerekçesi Belirtiniz</label>
               <textarea
                 value={rejectReasonText}
                 onChange={(e) => setRejectReasonText(e.target.value)}
                 rows={2}
-                className="w-full bg-slate-900 border border-white/10 rounded-xl text-sm p-3 text-white focus:border-rose-500 focus:ring-rose-500 focus:outline-none"
+                className="w-full bg-surface border border-border-color rounded-xl text-sm p-3 text-on-surface focus:border-rose-500 focus:ring-rose-500 focus:outline-none"
                 placeholder="Örn: Nakliye fiyatlandırması çok yüksek veya malzeme kalitesi spektlerimizi karşılamıyor..."
               />
               <div className="flex gap-3 justify-end">
                 <button
                   onClick={() => setRejectPanelOpen(false)}
-                  className="px-4 py-2 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-white cursor-pointer"
+                  className="px-4 py-2 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface cursor-pointer"
                 >
                   İptal
                 </button>
                 <button
                   onClick={handleConfirmRejectMatch}
-                  className="px-4 py-2 rounded-lg text-xs font-semibold text-rose-400 bg-rose-500/10 border border-rose-500/20 cursor-pointer"
+                  className="px-4 py-2 rounded-lg text-xs font-semibold text-rose-600 bg-rose-500/10 border border-rose-500/20 cursor-pointer"
                 >
                   Reddetmeyi Onayla
                 </button>

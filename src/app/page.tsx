@@ -366,7 +366,7 @@ export default function Home() {
           {sidebarOpen && (
             <div
               onClick={() => setSidebarOpen(false)}
-              className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300"
+              className="fixed inset-0 bg-on-surface/40 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300"
             />
           )}
 
@@ -393,7 +393,7 @@ export default function Home() {
             />
 
             {/* View Panels */}
-            <main className="flex-grow p-4 md:p-8 bg-slate-950 relative overflow-y-auto">
+            <main className="flex-grow p-4 md:p-8 bg-background relative overflow-y-auto">
               {currentPage === "dashboard" && (
                 <DashboardView
                   outputsCount={outputs.length}

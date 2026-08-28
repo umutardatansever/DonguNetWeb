@@ -31,14 +31,14 @@ export default function ChatWidget({ chatMessages, onSend, isTyping }: ChatWidge
     <div className={styles.wrapper}>
       {open && (
         <div className={`${styles.panel} glass-panel rounded-2xl overflow-hidden`}>
-          <div className="bg-slate-900/60 p-3.5 border-b border-white/5 flex items-center justify-between">
+          <div className="bg-surface-light/70 p-3.5 border-b border-border-color flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-lg bg-accent-mint/10 flex items-center justify-center border border-accent-mint/20">
                 <span className="material-symbols-outlined text-accent-mint text-[18px]">smart_toy</span>
               </div>
-              <span className="text-xs font-bold text-white">DöngüNet AI Asistanı</span>
+              <span className="text-xs font-bold text-on-surface">DöngüNet AI Asistanı</span>
             </div>
-            <button onClick={() => setOpen(false)} className="text-on-surface-variant hover:text-white cursor-pointer">
+            <button onClick={() => setOpen(false)} className="text-on-surface-variant hover:text-on-surface cursor-pointer">
               <span className="material-symbols-outlined text-[18px]">close</span>
             </button>
           </div>
@@ -52,7 +52,7 @@ export default function ChatWidget({ chatMessages, onSend, isTyping }: ChatWidge
                 <div
                   className={`p-2.5 rounded-xl text-[11px] leading-relaxed ${
                     msg.role === "assistant"
-                      ? "bg-surface/60 text-white rounded-tl-none border border-white/5"
+                      ? "bg-surface text-on-surface rounded-tl-none border border-border-color"
                       : "bg-accent-mint text-white rounded-tr-none"
                   }`}
                   dangerouslySetInnerHTML={{ __html: msg.content }}
@@ -61,7 +61,7 @@ export default function ChatWidget({ chatMessages, onSend, isTyping }: ChatWidge
             ))}
             {isTyping && (
               <div className="flex gap-2 max-w-[90%] self-start">
-                <div className="p-2.5 rounded-xl text-[11px] bg-surface/60 text-on-surface-variant rounded-tl-none border border-white/5">
+                <div className="p-2.5 rounded-xl text-[11px] bg-surface text-on-surface-variant rounded-tl-none border border-border-color">
                   yazıyor...
                 </div>
               </div>
@@ -69,7 +69,7 @@ export default function ChatWidget({ chatMessages, onSend, isTyping }: ChatWidge
             <div ref={endRef} />
           </div>
 
-          <div className="p-3 border-t border-white/5 bg-slate-900/40 flex gap-2">
+          <div className="p-3 border-t border-border-color bg-surface-light/50 flex gap-2">
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -77,7 +77,7 @@ export default function ChatWidget({ chatMessages, onSend, isTyping }: ChatWidge
                 if (e.key === "Enter") handleSend();
               }}
               type="text"
-              className="flex-grow bg-slate-900 border border-white/10 rounded-lg text-xs px-3 py-2.5 text-white focus:outline-none focus:border-accent-mint"
+              className="flex-grow bg-surface border border-border-color rounded-lg text-xs px-3 py-2.5 text-on-surface focus:outline-none focus:border-accent-mint"
               placeholder="Sorunuzu yazın..."
             />
             <button

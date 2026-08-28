@@ -36,13 +36,13 @@ export default function Sidebar({
         <div className={styles.logoArea}>
           <div className="flex items-center gap-3">
             <span className="material-symbols-outlined text-accent-mint text-3xl filled">recycling</span>
-            <span className="font-title text-xl font-bold tracking-tight text-white">
+            <span className="font-title text-xl font-bold tracking-tight text-on-surface">
               Döngü<span className="text-accent-mint">Net</span>
             </span>
           </div>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden w-8 h-8 rounded-lg bg-slate-800 border border-white/5 flex items-center justify-center text-on-surface-variant hover:text-white cursor-pointer"
+            className="lg:hidden w-8 h-8 rounded-lg bg-surface-light border border-border-color flex items-center justify-center text-on-surface-variant hover:text-on-surface cursor-pointer"
           >
             <span className="material-symbols-outlined text-[18px]">close</span>
           </button>
@@ -117,7 +117,7 @@ export default function Sidebar({
             <span className="material-symbols-outlined text-accent-mint">factory</span>
           </div>
           <div className="overflow-hidden">
-            <h4 className="text-xs font-bold text-white truncate">
+            <h4 className="text-xs font-bold text-on-surface truncate">
               {userRole === "osb" ? "Gebze OSB Müdürlüğü" : userRole === "admin" ? "DöngüNet Sistem Admini" : "Gebze Metal A.Ş."}
             </h4>
             <p className="text-[10px] text-on-surface-variant">
@@ -127,7 +127,7 @@ export default function Sidebar({
         </div>
         <button
           onClick={onLogout}
-          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs font-semibold text-rose-400 bg-rose-500/5 border border-rose-500/10 hover:bg-rose-500/10 hover:border-rose-500/20 transition-all cursor-pointer"
+          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs font-semibold text-rose-600 bg-rose-500/10 border border-rose-500/15 hover:bg-rose-500/15 hover:border-rose-500/30 transition-all cursor-pointer"
         >
           <span className="material-symbols-outlined text-[16px]">logout</span>
           Çıkış Yap

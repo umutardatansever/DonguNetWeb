@@ -49,8 +49,8 @@ export default function AddOutputModal({ isOpen, onClose, onSubmit }: AddOutputM
     <div className={styles.backdrop}>
       <div className={`${styles.modalContent} glass-panel`}>
         <div className="flex justify-between items-center">
-          <h3 className="font-title font-bold text-lg text-white">Yeni Çıktı / Atık Girişi</h3>
-          <button onClick={onClose} className="text-on-surface-variant hover:text-white cursor-pointer">
+          <h3 className="font-title font-bold text-lg text-on-surface">Yeni Çıktı / Atık Girişi</h3>
+          <button onClick={onClose} className="text-on-surface-variant hover:text-on-surface cursor-pointer">
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
@@ -62,7 +62,7 @@ export default function AddOutputModal({ isOpen, onClose, onSubmit }: AddOutputM
               onChange={(e) => setFormOutName(e.target.value)}
               type="text"
               required
-              className="bg-slate-900 border border-white/10 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-accent-mint"
+              className="bg-surface border border-border-color rounded-xl p-3 text-sm text-on-surface focus:outline-none focus:border-accent-mint"
               placeholder="Örn: Demir Alaşımlı Toz"
             />
           </div>
@@ -72,7 +72,7 @@ export default function AddOutputModal({ isOpen, onClose, onSubmit }: AddOutputM
               <select
                 value={formOutClass}
                 onChange={(e) => setFormOutClass(e.target.value)}
-                className="bg-slate-900 border border-white/10 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-accent-mint"
+                className="bg-surface border border-border-color rounded-xl p-3 text-sm text-on-surface focus:outline-none focus:border-accent-mint"
               >
                 <option value="METAL">Metal</option>
                 <option value="PLASTIC">Plastik</option>
@@ -91,7 +91,7 @@ export default function AddOutputModal({ isOpen, onClose, onSubmit }: AddOutputM
                 onChange={(e) => setFormOutComp(e.target.value)}
                 type="text"
                 required
-                className="bg-slate-900 border border-white/10 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-accent-mint"
+                className="bg-surface border border-border-color rounded-xl p-3 text-sm text-on-surface focus:outline-none focus:border-accent-mint"
                 placeholder="Örn: Al %95, Fe %2"
               />
             </div>
@@ -104,7 +104,7 @@ export default function AddOutputModal({ isOpen, onClose, onSubmit }: AddOutputM
                 onChange={(e) => setFormOutQty(e.target.value)}
                 type="number"
                 required
-                className="bg-slate-900 border border-white/10 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-accent-mint"
+                className="bg-surface border border-border-color rounded-xl p-3 text-sm text-on-surface focus:outline-none focus:border-accent-mint"
                 placeholder="1000"
               />
             </div>
@@ -115,7 +115,7 @@ export default function AddOutputModal({ isOpen, onClose, onSubmit }: AddOutputM
                 onChange={(e) => setFormOutStock(e.target.value)}
                 type="number"
                 required
-                className="bg-slate-900 border border-white/10 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-accent-mint"
+                className="bg-surface border border-border-color rounded-xl p-3 text-sm text-on-surface focus:outline-none focus:border-accent-mint"
                 placeholder="1000"
               />
             </div>

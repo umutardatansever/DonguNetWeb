@@ -49,11 +49,11 @@ export default function AdminView({
 
   return (
     <div className={styles.container}>
-      <div className="flex gap-2 p-1 rounded-xl bg-slate-900 border border-white/5 self-start overflow-x-auto">
+      <div className="flex gap-2 p-1 rounded-xl bg-surface-light border border-border-color self-start overflow-x-auto">
         <button
           onClick={() => setTab("users")}
           className={`px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
-            tab === "users" ? "text-white bg-slate-700" : "text-on-surface-variant hover:text-white"
+            tab === "users" ? "text-white bg-primary shadow-sm" : "text-on-surface-variant hover:text-on-surface"
           }`}
         >
           Kullanıcı Yönetimi
@@ -61,7 +61,7 @@ export default function AdminView({
         <button
           onClick={() => setTab("review")}
           className={`px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
-            tab === "review" ? "text-white bg-slate-700" : "text-on-surface-variant hover:text-white"
+            tab === "review" ? "text-white bg-primary shadow-sm" : "text-on-surface-variant hover:text-on-surface"
           }`}
         >
           Onay Kuyruğu (HITL) {pendingReview.length > 0 && `(${pendingReview.length})`}
@@ -69,7 +69,7 @@ export default function AdminView({
         <button
           onClick={() => setTab("weights")}
           className={`px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
-            tab === "weights" ? "text-white bg-slate-700" : "text-on-surface-variant hover:text-white"
+            tab === "weights" ? "text-white bg-primary shadow-sm" : "text-on-surface-variant hover:text-on-surface"
           }`}
         >
           AHP Ağırlık Kalibrasyonu
@@ -89,21 +89,21 @@ export default function AdminView({
                   <th className={`${styles.tableCell} text-right`}>İşlemler</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5 text-sm text-white">
+              <tbody className="divide-y divide-border-color text-sm text-on-surface">
                 {users.map((u) => (
                   <tr key={u.id}>
                     <td className={`${styles.tableCell} font-semibold`}>{u.name}</td>
                     <td className={`${styles.tableCell} text-on-surface-variant`}>{u.email}</td>
                     <td className={`${styles.tableCell} text-on-surface-variant`}>{u.facility}</td>
                     <td className={styles.tableCell}>
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-teal-400 border border-teal-500/10">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-teal-600/10 text-teal-700 border border-teal-600/15">
                         {ROLE_LABEL[u.role]}
                       </span>
                     </td>
                     <td className={`${styles.tableCell} text-right`}>
                       <button
                         onClick={() => onRemoveUser(u.id)}
-                        className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500/20 transition-all cursor-pointer"
+                        className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-500/10 border border-rose-500/20 text-rose-600 hover:bg-rose-500/20 transition-all cursor-pointer"
                       >
                         Kaldır
                       </button>
@@ -127,21 +127,21 @@ export default function AdminView({
             <div key={item.id} className="glass-panel p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-2">
-                  <h4 className="font-title font-bold text-white text-sm">{item.matchName}</h4>
+                  <h4 className="font-title font-bold text-on-surface text-sm">{item.matchName}</h4>
                   <span
                     className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase border ${
                       item.status === "pending"
-                        ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                        ? "bg-amber-500/10 text-amber-700 border-amber-500/20"
                         : item.status === "approved"
                         ? "bg-accent-mint/10 text-accent-mint border-accent-mint/20"
-                        : "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                        : "bg-rose-500/10 text-rose-600 border-rose-500/20"
                     }`}
                   >
                     {item.status === "pending" ? "Bekliyor" : item.status === "approved" ? "Onaylandı" : "Reddedildi"}
                   </span>
                 </div>
                 <p className="text-[11px] text-on-surface-variant">
-                  Güven skoru: <span className="text-white font-semibold">{(item.confidence * 100).toFixed(0)}%</span> — {item.reason}
+                  Güven skoru: <span className="text-on-surface font-semibold">{(item.confidence * 100).toFixed(0)}%</span> — {item.reason}
                 </p>
               </div>
               {item.status === "pending" && (
@@ -154,7 +154,7 @@ export default function AdminView({
                   </button>
                   <button
                     onClick={() => onRejectReview(item.id)}
-                    className="px-4 py-2 rounded-lg text-xs font-bold bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500/20 cursor-pointer"
+                    className="px-4 py-2 rounded-lg text-xs font-bold bg-rose-500/10 border border-rose-500/20 text-rose-600 hover:bg-rose-500/20 cursor-pointer"
                   >
                     Reddet
                   </button>
@@ -168,7 +168,7 @@ export default function AdminView({
       {tab === "weights" && (
         <div className="glass-panel p-6 rounded-2xl flex flex-col gap-6">
           <div>
-            <h3 className="font-title font-bold text-white text-base">5 Faktörlü Skor Ağırlıkları</h3>
+            <h3 className="font-title font-bold text-on-surface text-base">5 Faktörlü Skor Ağırlıkları</h3>
             <p className="text-xs text-on-surface-variant mt-1">
               Toplam tam olarak %100 olmalıdır. Değişiklik yeni bir weights_config versiyonu olarak aktif edilir.
             </p>
@@ -177,7 +177,7 @@ export default function AdminView({
           {(Object.keys(draftWeights) as (keyof WeightsConfig)[]).map((key) => (
             <div key={key} className="flex flex-col gap-2">
               <div className="flex justify-between text-xs">
-                <span className="font-semibold text-white capitalize">
+                <span className="font-semibold text-on-surface capitalize">
                   {key === "material" && "Malzeme"}
                   {key === "quality" && "Kalite"}
                   {key === "environmental" && "Çevresel"}
@@ -197,8 +197,8 @@ export default function AdminView({
             </div>
           ))}
 
-          <div className="flex justify-between items-center border-t border-white/5 pt-4">
-            <span className={`text-sm font-bold ${isValidTotal ? "text-accent-mint" : "text-rose-400"}`}>
+          <div className="flex justify-between items-center border-t border-border-color pt-4">
+            <span className={`text-sm font-bold ${isValidTotal ? "text-accent-mint" : "text-rose-600"}`}>
               Toplam: {total}% {!isValidTotal && "(100% olmalı)"}
             </span>
             <button

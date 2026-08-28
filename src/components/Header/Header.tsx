@@ -48,19 +48,19 @@ export default function Header({
       <div className="flex items-center gap-2 md:gap-4 min-w-0">
         <button
           onClick={() => setSidebarOpen(true)}
-          className="lg:hidden w-10 h-10 rounded-xl bg-slate-800 border border-white/5 flex items-center justify-center text-on-surface-variant hover:text-white mr-1 shrink-0 cursor-pointer"
+          className="lg:hidden w-10 h-10 rounded-xl bg-surface-light border border-border-color flex items-center justify-center text-on-surface-variant hover:text-on-surface mr-1 shrink-0 cursor-pointer"
         >
           <span className="material-symbols-outlined text-[20px]">menu</span>
         </button>
-        <h2 className="font-title text-base md:text-xl font-bold text-white truncate">
+        <h2 className="font-title text-base md:text-xl font-bold text-on-surface truncate">
           {getPageTitle()}
         </h2>
         <span
           className={`px-2 py-0.5 rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-wider border shrink-0 ${
             userRole === "osb"
-              ? "bg-teal-400/10 text-teal-400 border-teal-400/20"
+              ? "bg-teal-600/10 text-teal-700 border-teal-600/20"
               : userRole === "admin"
-              ? "bg-amber-400/10 text-amber-400 border-amber-400/20"
+              ? "bg-amber-600/10 text-amber-700 border-amber-600/20"
               : "bg-accent-mint/10 text-accent-mint border-accent-mint/20"
           }`}
         >
@@ -70,9 +70,9 @@ export default function Header({
 
       <div className="flex items-center gap-2 md:gap-4 shrink-0">
         <NotificationCenter notifications={notifications} onMarkRead={onMarkRead} onMarkAllRead={onMarkAllRead} />
-        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800 border border-white/5">
+        <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-surface-light border border-border-color">
           <span className="w-2 h-2 rounded-full bg-accent-mint animate-pulse"></span>
-          <span className="text-xs font-semibold text-white">Bağlı (Simüle)</span>
+          <span className="text-xs font-semibold text-on-surface">Bağlı (Simüle)</span>
         </div>
       </div>
     </header>

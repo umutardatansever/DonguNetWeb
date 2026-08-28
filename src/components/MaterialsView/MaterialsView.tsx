@@ -26,12 +26,12 @@ export default function MaterialsView({
   return (
     <div className={styles.container}>
       {/* Tabs */}
-      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-white/5 pb-4">
-        <div className="flex gap-2 p-1 rounded-xl bg-slate-900 border border-white/5 self-start">
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 border-b border-border-color pb-4">
+        <div className="flex gap-2 p-1 rounded-xl bg-surface-light border border-border-color self-start">
           <button
             onClick={() => setCurrentTab("outputs")}
             className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-              currentTab === "outputs" ? "text-white bg-slate-700" : "text-on-surface-variant hover:text-white"
+              currentTab === "outputs" ? "text-white bg-primary shadow-sm" : "text-on-surface-variant hover:text-on-surface"
             }`}
           >
             Üretilen Çıktılar / Atıklar
@@ -39,7 +39,7 @@ export default function MaterialsView({
           <button
             onClick={() => setCurrentTab("inputs")}
             className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-              currentTab === "inputs" ? "text-white bg-slate-700" : "text-on-surface-variant hover:text-white"
+              currentTab === "inputs" ? "text-white bg-primary shadow-sm" : "text-on-surface-variant hover:text-on-surface"
             }`}
           >
             Girdi İhtiyaçları
@@ -84,18 +84,18 @@ export default function MaterialsView({
                     <th className={`${styles.tableCell} text-right`}>İşlemler</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5 text-sm text-white">
+                <tbody className="divide-y divide-border-color text-sm text-on-surface">
                   {outputs.map((out) => (
                     <tr key={out.id}>
-                      <td className={`${styles.tableCell} font-semibold text-white`}>{out.name}</td>
+                      <td className={`${styles.tableCell} font-semibold text-on-surface`}>{out.name}</td>
                       <td className={styles.tableCell}>
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-teal-400 border border-teal-500/10">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-teal-600/10 text-teal-700 border border-teal-600/15">
                           {out.class}
                         </span>
                       </td>
                       <td className={`${styles.tableCell} text-on-surface-variant`}>{out.composition}</td>
-                      <td className={`${styles.tableCell} font-mono text-white`}>{out.quantity.toLocaleString()}</td>
-                      <td className={`${styles.tableCell} font-mono text-white`}>{out.stock.toLocaleString()}</td>
+                      <td className={`${styles.tableCell} font-mono text-on-surface`}>{out.quantity.toLocaleString()}</td>
+                      <td className={`${styles.tableCell} font-mono text-on-surface`}>{out.stock.toLocaleString()}</td>
                       <td className={`${styles.tableCell} text-on-surface-variant`}>{out.date}</td>
                       <td className={`${styles.tableCell} text-right`}>
                         <button
@@ -113,30 +113,30 @@ export default function MaterialsView({
             </div>
 
             {/* Mobile Cards */}
-            <div className="md:hidden flex flex-col divide-y divide-white/5">
+            <div className="md:hidden flex flex-col divide-y divide-border-color">
               {outputs.map((out) => (
                 <div key={out.id} className={styles.mobileCard}>
                   <div className="flex justify-between items-start">
                     <div>
-                      <h4 className="font-title font-bold text-white text-sm">{out.name}</h4>
+                      <h4 className="font-title font-bold text-on-surface text-sm">{out.name}</h4>
                       <span className="text-[10px] text-on-surface-variant block mt-1">Kayıt: {out.date}</span>
                     </div>
-                    <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-slate-800 text-teal-400 border border-teal-500/10 shrink-0">
+                    <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-teal-600/10 text-teal-700 border border-teal-600/15 shrink-0">
                       {out.class}
                     </span>
                   </div>
-                  <div className="grid grid-cols-3 gap-2 text-xs border-y border-white/[0.03] py-2">
+                  <div className="grid grid-cols-3 gap-2 text-xs border-y border-border-color py-2">
                     <div>
                       <span className="text-on-surface-variant text-[9px] block">Miktar</span>
-                      <span className="text-white font-mono font-medium">{out.quantity.toLocaleString()} kg</span>
+                      <span className="text-on-surface font-mono font-medium">{out.quantity.toLocaleString()} kg</span>
                     </div>
                     <div>
                       <span className="text-on-surface-variant text-[9px] block">Stok</span>
-                      <span className="text-white font-mono font-medium">{out.stock.toLocaleString()} kg</span>
+                      <span className="text-on-surface font-mono font-medium">{out.stock.toLocaleString()} kg</span>
                     </div>
                     <div>
                       <span className="text-on-surface-variant text-[9px] block">Bileşim</span>
-                      <span className="text-white truncate block max-w-[80px]" title={out.composition}>
+                      <span className="text-on-surface truncate block max-w-[80px]" title={out.composition}>
                         {out.composition}
                       </span>
                     </div>
@@ -168,17 +168,17 @@ export default function MaterialsView({
                     <th className={`${styles.tableCell} text-right`}>İşlemler</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5 text-sm text-white">
+                <tbody className="divide-y divide-border-color text-sm text-on-surface">
                   {inputs.map((input) => (
                     <tr key={input.id}>
-                      <td className={`${styles.tableCell} font-semibold text-white`}>{input.name}</td>
+                      <td className={`${styles.tableCell} font-semibold text-on-surface`}>{input.name}</td>
                       <td className={styles.tableCell}>
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-blue-400 border border-blue-500/10">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-600/10 text-blue-700 border border-blue-600/15">
                           {input.class}
                         </span>
                       </td>
                       <td className={`${styles.tableCell} text-on-surface-variant`}>{input.specs}</td>
-                      <td className={`${styles.tableCell} font-mono text-white`}>{input.quantity.toLocaleString()}</td>
+                      <td className={`${styles.tableCell} font-mono text-on-surface`}>{input.quantity.toLocaleString()}</td>
                       <td className={`${styles.tableCell} text-on-surface-variant`}>{input.frequency}</td>
                       <td className={`${styles.tableCell} text-on-surface-variant`}>{input.date}</td>
                       <td className={`${styles.tableCell} text-right text-on-surface-variant text-xs font-medium`}>
@@ -191,30 +191,30 @@ export default function MaterialsView({
             </div>
 
             {/* Mobile Cards */}
-            <div className="md:hidden flex flex-col divide-y divide-white/5">
+            <div className="md:hidden flex flex-col divide-y divide-border-color">
               {inputs.map((input) => (
                 <div key={input.id} className={styles.mobileCard}>
                   <div className="flex justify-between items-start">
                     <div>
-                      <h4 className="font-title font-bold text-white text-sm">{input.name}</h4>
+                      <h4 className="font-title font-bold text-on-surface text-sm">{input.name}</h4>
                       <span className="text-[10px] text-on-surface-variant block mt-1">Kayıt: {input.date}</span>
                     </div>
-                    <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-slate-800 text-blue-400 border border-blue-500/10 shrink-0">
+                    <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-blue-600/10 text-blue-700 border border-blue-600/15 shrink-0">
                       {input.class}
                     </span>
                   </div>
-                  <div className="grid grid-cols-3 gap-2 text-xs border-y border-white/[0.03] py-2">
+                  <div className="grid grid-cols-3 gap-2 text-xs border-y border-border-color py-2">
                     <div>
                       <span className="text-on-surface-variant text-[9px] block">İhtiyaç</span>
-                      <span className="text-white font-mono font-medium">{input.quantity.toLocaleString()} kg</span>
+                      <span className="text-on-surface font-mono font-medium">{input.quantity.toLocaleString()} kg</span>
                     </div>
                     <div>
                       <span className="text-on-surface-variant text-[9px] block">Frekans</span>
-                      <span className="text-white font-medium">{input.frequency}</span>
+                      <span className="text-on-surface font-medium">{input.frequency}</span>
                     </div>
                     <div className="col-span-1">
                       <span className="text-on-surface-variant text-[9px] block">Özellik</span>
-                      <span className="text-white truncate block max-w-[80px]" title={input.specs}>
+                      <span className="text-on-surface truncate block max-w-[80px]" title={input.specs}>
                         {input.specs}
                       </span>
                     </div>

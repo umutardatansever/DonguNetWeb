@@ -41,7 +41,7 @@ export default function DashboardView({ outputsCount, inputsCount, outputs }: Da
     ctx.clearRect(0, 0, w, h);
 
     // Grid lines
-    ctx.strokeStyle = "rgba(255,255,255,0.03)";
+    ctx.strokeStyle = "rgba(29,36,32,0.06)";
     ctx.lineWidth = 1;
     for (let i = 0; i < 5; i++) {
       const gridY = padding + (i / 4) * (h - 2 * padding);
@@ -53,8 +53,8 @@ export default function DashboardView({ outputsCount, inputsCount, outputs }: Da
 
     // Fill Gradient below curve
     const gradient = ctx.createLinearGradient(0, padding, 0, h - padding);
-    gradient.addColorStop(0, "rgba(16, 185, 129, 0.2)");
-    gradient.addColorStop(1, "rgba(16, 185, 129, 0)");
+    gradient.addColorStop(0, "rgba(30, 95, 70, 0.18)");
+    gradient.addColorStop(1, "rgba(30, 95, 70, 0)");
 
     ctx.beginPath();
     ctx.moveTo(points[0].x, h - padding);
@@ -76,23 +76,23 @@ export default function DashboardView({ outputsCount, inputsCount, outputs }: Da
       ctx.quadraticCurveTo(points[i].x, points[i].y, cpX, (points[i].y + points[i + 1].y) / 2);
     }
     ctx.lineTo(points[points.length - 1].x, points[points.length - 1].y);
-    ctx.strokeStyle = "#10b981";
+    ctx.strokeStyle = "#1e5f46";
     ctx.lineWidth = 2.5;
     ctx.stroke();
 
     // Dots and labels
-    ctx.fillStyle = "#ffffff";
+    ctx.fillStyle = "#fffdf8";
     ctx.font = "9px Inter, sans-serif";
     ctx.textAlign = "center";
     points.forEach((pt, i) => {
       ctx.beginPath();
       ctx.arc(pt.x, pt.y, 4, 0, 2 * Math.PI);
       ctx.fill();
-      ctx.strokeStyle = "#059669";
+      ctx.strokeStyle = "#1e5f46";
       ctx.lineWidth = 1.5;
       ctx.stroke();
 
-      ctx.fillStyle = "#94a3b8";
+      ctx.fillStyle = "#666f63";
       ctx.fillText(data[i] + "kg", pt.x, pt.y - 10);
     });
   };
@@ -125,7 +125,7 @@ export default function DashboardView({ outputsCount, inputsCount, outputs }: Da
     ctx.clearRect(0, 0, w, h);
 
     // Grids
-    ctx.strokeStyle = "rgba(255,255,255,0.03)";
+    ctx.strokeStyle = "rgba(29,36,32,0.06)";
     for (let i = 0; i < 5; i++) {
       const gridY = padding + (i / 4) * (h - 2 * padding);
       ctx.beginPath();
@@ -137,7 +137,7 @@ export default function DashboardView({ outputsCount, inputsCount, outputs }: Da
     // Historical Curve
     ctx.beginPath();
     ctx.lineWidth = 2;
-    ctx.strokeStyle = "#0d9488";
+    ctx.strokeStyle = "#0f7a6c";
 
     let lastX = padding;
     let lastY = mapValueToY(histData[0]);
@@ -155,7 +155,7 @@ export default function DashboardView({ outputsCount, inputsCount, outputs }: Da
     // Forecast Curve
     ctx.beginPath();
     ctx.setLineDash([5, 4]);
-    ctx.strokeStyle = "#a855f7";
+    ctx.strokeStyle = "#7e22ce";
     ctx.moveTo(lastX, lastY);
 
     const fcPoints = [{ x: lastX, y: lastY }];
@@ -170,7 +170,7 @@ export default function DashboardView({ outputsCount, inputsCount, outputs }: Da
 
     // Shaded bounds
     ctx.beginPath();
-    ctx.fillStyle = "rgba(168, 85, 247, 0.08)";
+    ctx.fillStyle = "rgba(126, 34, 206, 0.08)";
     ctx.moveTo(fcPoints[0].x, fcPoints[0].y);
     ctx.lineTo(fcPoints[1].x, fcPoints[1].y - 15);
     ctx.lineTo(fcPoints[2].x, fcPoints[2].y - 30);
@@ -180,12 +180,12 @@ export default function DashboardView({ outputsCount, inputsCount, outputs }: Da
     ctx.fill();
 
     // Labels
-    ctx.fillStyle = "#94a3b8";
+    ctx.fillStyle = "#666f63";
     ctx.font = "9px Inter, sans-serif";
     ctx.textAlign = "left";
     ctx.fillText("Geçmiş", padding + 10, h - 10);
     ctx.textAlign = "right";
-    ctx.fillStyle = "#a855f7";
+    ctx.fillStyle = "#7e22ce";
     ctx.fillText("AI Tahmini", w - padding - 10, h - 10);
   };
 
@@ -211,7 +211,7 @@ export default function DashboardView({ outputsCount, inputsCount, outputs }: Da
             Aktif Ürün/Atık
           </span>
           <div className="flex items-baseline justify-between mt-4">
-            <span className="text-xl md:text-3xl font-extrabold font-title text-white">{outputsCount}</span>
+            <span className="text-xl md:text-3xl font-extrabold font-title text-on-surface">{outputsCount}</span>
             <span className="material-symbols-outlined text-accent-mint text-lg md:text-2xl">arrow_upward</span>
           </div>
         </div>
@@ -220,8 +220,8 @@ export default function DashboardView({ outputsCount, inputsCount, outputs }: Da
             Tanımlı Girdi
           </span>
           <div className="flex items-baseline justify-between mt-4">
-            <span className="text-xl md:text-3xl font-extrabold font-title text-white">{inputsCount}</span>
-            <span className="material-symbols-outlined text-slate-500 text-lg md:text-2xl">horizontal_rule</span>
+            <span className="text-xl md:text-3xl font-extrabold font-title text-on-surface">{inputsCount}</span>
+            <span className="material-symbols-outlined text-on-surface-variant text-lg md:text-2xl">horizontal_rule</span>
           </div>
         </div>
         <div className="glass-panel p-4 md:p-6 rounded-2xl flex flex-col justify-between">
@@ -240,8 +240,8 @@ export default function DashboardView({ outputsCount, inputsCount, outputs }: Da
             Önlenen CO2
           </span>
           <div className="flex items-baseline justify-between mt-4">
-            <span className="text-xl md:text-3xl font-extrabold font-title text-teal-400">900 kg</span>
-            <span className="material-symbols-outlined text-teal-400 text-lg md:text-2xl">eco</span>
+            <span className="text-xl md:text-3xl font-extrabold font-title text-teal-700">900 kg</span>
+            <span className="material-symbols-outlined text-teal-700 text-lg md:text-2xl">eco</span>
           </div>
         </div>
       </div>
@@ -250,7 +250,7 @@ export default function DashboardView({ outputsCount, inputsCount, outputs }: Da
       <div className={styles.chartsGrid}>
         <div className="glass-panel p-6 rounded-2xl flex flex-col gap-4">
           <div className="flex justify-between items-center">
-            <h3 className="font-title font-bold text-white flex items-center gap-2">
+            <h3 className="font-title font-bold text-on-surface flex items-center gap-2">
               <span className="material-symbols-outlined text-accent-mint">sensors</span>
               IoT Canlı Atık Akış Takibi (Aylık Birikim)
             </h3>
@@ -263,11 +263,11 @@ export default function DashboardView({ outputsCount, inputsCount, outputs }: Da
 
         <div className="glass-panel p-6 rounded-2xl flex flex-col gap-4">
           <div className="flex justify-between items-center">
-            <h3 className="font-title font-bold text-white flex items-center gap-2">
-              <span className="material-symbols-outlined text-teal-400">online_prediction</span>
+            <h3 className="font-title font-bold text-on-surface flex items-center gap-2">
+              <span className="material-symbols-outlined text-teal-700">online_prediction</span>
               Prophet AI Gelecek Dönem Atık Birikim Öngörüsü
             </h3>
-            <span className="px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 text-[10px] font-bold">ÖNGÖRÜ</span>
+            <span className="px-2 py-0.5 rounded bg-purple-600/10 text-purple-700 text-[10px] font-bold">ÖNGÖRÜ</span>
           </div>
           <div className={styles.canvasWrapper}>
             <canvas ref={forecastCanvasRef} className={styles.canvas}></canvas>
