@@ -4,9 +4,11 @@ import React from "react";
 import styles from "./Sidebar.module.css";
 
 interface SidebarProps {
-  userRole: "user" | "osb" | "none";
-  currentPage: "landing" | "dashboard" | "materials" | "matchmaker" | "reports" | "chatbot" | "osb";
-  setCurrentPage: (page: "landing" | "dashboard" | "materials" | "matchmaker" | "reports" | "chatbot" | "osb") => void;
+  userRole: "user" | "osb" | "admin" | "none";
+  currentPage: "landing" | "dashboard" | "materials" | "matchmaker" | "reports" | "chatbot" | "osb" | "admin";
+  setCurrentPage: (
+    page: "landing" | "dashboard" | "materials" | "matchmaker" | "reports" | "chatbot" | "osb" | "admin"
+  ) => void;
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
   onLogout: () => void;
@@ -20,7 +22,9 @@ export default function Sidebar({
   setSidebarOpen,
   onLogout,
 }: SidebarProps) {
-  const handleNavClick = (page: "dashboard" | "materials" | "matchmaker" | "reports" | "chatbot" | "osb") => {
+  const handleNavClick = (
+    page: "dashboard" | "materials" | "matchmaker" | "reports" | "chatbot" | "osb" | "admin"
+  ) => {
     setCurrentPage(page);
     setSidebarOpen(false);
   };
@@ -94,6 +98,15 @@ export default function Sidebar({
               OSB Yönetici Paneli
             </button>
           )}
+          {userRole === "admin" && (
+            <button
+              onClick={() => handleNavClick("admin")}
+              className={`${styles.link} ${currentPage === "admin" ? styles.linkActive : styles.linkInactive}`}
+            >
+              <span className="material-symbols-outlined text-[20px]">admin_panel_settings</span>
+              Sistem Admin Paneli
+            </button>
+          )}
         </nav>
       </div>
 
@@ -105,10 +118,10 @@ export default function Sidebar({
           </div>
           <div className="overflow-hidden">
             <h4 className="text-xs font-bold text-white truncate">
-              {userRole === "osb" ? "Gebze OSB Müdürlüğü" : "Gebze Metal A.Ş."}
+              {userRole === "osb" ? "Gebze OSB Müdürlüğü" : userRole === "admin" ? "DöngüNet Sistem Admini" : "Gebze Metal A.Ş."}
             </h4>
             <p className="text-[10px] text-on-surface-variant">
-              {userRole === "osb" ? "Bölge Yöneticisi" : "Tesis Temsilcisi"}
+              {userRole === "osb" ? "Bölge Yöneticisi" : userRole === "admin" ? "Sistem Yöneticisi" : "Tesis Temsilcisi"}
             </p>
           </div>
         </div>

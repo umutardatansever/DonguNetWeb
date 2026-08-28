@@ -2,14 +2,26 @@
 
 import React from "react";
 import styles from "./Header.module.css";
+import NotificationCenter from "../Notifications/NotificationCenter";
+import { AppNotification } from "../../types";
 
 interface HeaderProps {
-  userRole: "user" | "osb" | "none";
-  currentPage: "landing" | "dashboard" | "materials" | "matchmaker" | "reports" | "chatbot" | "osb";
+  userRole: "user" | "osb" | "admin" | "none";
+  currentPage: "landing" | "dashboard" | "materials" | "matchmaker" | "reports" | "chatbot" | "osb" | "admin";
   setSidebarOpen: (open: boolean) => void;
+  notifications: AppNotification[];
+  onMarkRead: (id: string) => void;
+  onMarkAllRead: () => void;
 }
 
-export default function Header({ userRole, currentPage, setSidebarOpen }: HeaderProps) {
+export default function Header({
+  userRole,
+  currentPage,
+  setSidebarOpen,
+  notifications,
+  onMarkRead,
+  onMarkAllRead,
+}: HeaderProps) {
   const getPageTitle = () => {
     switch (currentPage) {
       case "dashboard":
@@ -24,6 +36,8 @@ export default function Header({ userRole, currentPage, setSidebarOpen }: Header
         return "DöngüNet AI Asistanı";
       case "osb":
         return "OSB Yönetici Paneli";
+      case "admin":
+        return "Sistem Admin Paneli";
       default:
         return "";
     }
@@ -45,18 +59,17 @@ export default function Header({ userRole, currentPage, setSidebarOpen }: Header
           className={`px-2 py-0.5 rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-wider border shrink-0 ${
             userRole === "osb"
               ? "bg-teal-400/10 text-teal-400 border-teal-400/20"
+              : userRole === "admin"
+              ? "bg-amber-400/10 text-amber-400 border-amber-400/20"
               : "bg-accent-mint/10 text-accent-mint border-accent-mint/20"
           }`}
         >
-          {userRole === "osb" ? "OSB" : "TESİS"}
+          {userRole === "osb" ? "OSB" : userRole === "admin" ? "ADMIN" : "TESİS"}
         </span>
       </div>
 
       <div className="flex items-center gap-2 md:gap-4 shrink-0">
-        <button className="w-10 h-10 rounded-xl bg-slate-800 border border-white/5 flex items-center justify-center text-on-surface-variant hover:text-white transition-colors relative cursor-pointer">
-          <span className="material-symbols-outlined text-[20px]">notifications</span>
-          <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-accent-mint"></span>
-        </button>
+        <NotificationCenter notifications={notifications} onMarkRead={onMarkRead} onMarkAllRead={onMarkAllRead} />
         <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800 border border-white/5">
           <span className="w-2 h-2 rounded-full bg-accent-mint animate-pulse"></span>
           <span className="text-xs font-semibold text-white">Bağlı (Simüle)</span>

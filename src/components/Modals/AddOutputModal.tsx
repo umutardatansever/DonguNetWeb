@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import styles from "./Modal.module.css";
+import { mockClassify } from "../../lib/mockClassify";
 
 interface AddOutputModalProps {
   isOpen: boolean;
@@ -15,6 +16,12 @@ export default function AddOutputModal({ isOpen, onClose, onSubmit }: AddOutputM
   const [formOutComp, setFormOutComp] = useState("");
   const [formOutQty, setFormOutQty] = useState("");
   const [formOutStock, setFormOutStock] = useState("");
+
+  const classifyPreview = useMemo(() => {
+    const text = `${formOutName} ${formOutComp}`.trim();
+    if (!text) return null;
+    return mockClassify(text);
+  }, [formOutName, formOutComp]);
 
   if (!isOpen) return null;
 
@@ -113,6 +120,17 @@ export default function AddOutputModal({ isOpen, onClose, onSubmit }: AddOutputM
               />
             </div>
           </div>
+
+          {classifyPreview && (
+            <div className="flex items-center gap-2 p-3 rounded-xl bg-accent-mint/5 border border-accent-mint/15 text-xs">
+              <span className="material-symbols-outlined text-accent-mint text-[16px]">auto_awesome</span>
+              <span className="text-on-surface-variant">
+                AI Sınıflandırma Önizlemesi (simüle): <span className="text-accent-mint font-bold">{classifyPreview.label}</span>{" "}
+                — %{Math.round(classifyPreview.confidence * 100)} güven
+              </span>
+            </div>
+          )}
+
           <button type="submit" className="btn-primary w-full py-3.5 rounded-xl font-bold text-sm mt-4 cursor-pointer">
             Atık Kaydet ve Vektörleştir
           </button>

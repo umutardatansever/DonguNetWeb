@@ -26,7 +26,9 @@ export interface MatchCandidate {
   distance: number;
   co2: number;
   savings: number;
-  status: "pending" | "accepted" | "rejected";
+  status: "pending" | "accepted" | "rejected" | "completed";
+  date: string;
+  confidence: number;
   details: {
     material: number;
     quality: number;
@@ -46,4 +48,37 @@ export interface OSBVerification {
   name: string;
   sector: string;
   status: "pending" | "approved";
+}
+
+export interface AppNotification {
+  id: string;
+  type: "match_accepted" | "match_rejected" | "review_required" | "facility_verified";
+  title: string;
+  body: string;
+  read: boolean;
+  createdAt: string;
+}
+
+export interface PlatformUser {
+  id: string;
+  name: string;
+  email: string;
+  role: "user" | "admin" | "osb_manager";
+  facility: string;
+}
+
+export interface ReviewQueueItem {
+  id: string;
+  matchName: string;
+  confidence: number;
+  reason: string;
+  status: "pending" | "approved" | "rejected";
+}
+
+export interface WeightsConfig {
+  material: number;
+  quality: number;
+  environmental: number;
+  logistics: number;
+  economic: number;
 }

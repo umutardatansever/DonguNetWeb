@@ -1,7 +1,17 @@
 "use client";
 
 import React, { useState } from "react";
-import { OutputItem, InputItem, MatchCandidate, ChatMessage, OSBVerification } from "@/types";
+import {
+  OutputItem,
+  InputItem,
+  MatchCandidate,
+  ChatMessage,
+  OSBVerification,
+  AppNotification,
+  PlatformUser,
+  ReviewQueueItem,
+  WeightsConfig,
+} from "@/types";
 
 // Import Views
 import LandingView from "@/components/LandingView/LandingView";
@@ -13,6 +23,8 @@ import MatchmakerView from "@/components/MatchmakerView/MatchmakerView";
 import ReportsView from "@/components/ReportsView/ReportsView";
 import ChatbotView from "@/components/ChatbotView/ChatbotView";
 import OsbView from "@/components/OsbView/OsbView";
+import AdminView from "@/components/AdminView/AdminView";
+import ChatWidget from "@/components/ChatWidget/ChatWidget";
 
 // Import Modals
 import AddOutputModal from "@/components/Modals/AddOutputModal";
@@ -20,12 +32,16 @@ import AddInputModal from "@/components/Modals/AddInputModal";
 import DppModal from "@/components/Modals/DppModal";
 import SuccessModal from "@/components/Modals/SuccessModal";
 
+type UserRole = "user" | "osb" | "admin" | "none";
+type Page = "landing" | "dashboard" | "materials" | "matchmaker" | "reports" | "chatbot" | "osb" | "admin";
+
+const nowStamp = () =>
+  new Date().toLocaleString("tr-TR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+
 export default function Home() {
   // --- CORE ROUTING STATE ---
-  const [currentPage, setCurrentPage] = useState<
-    "landing" | "dashboard" | "materials" | "matchmaker" | "reports" | "chatbot" | "osb"
-  >("landing");
-  const [userRole, setUserRole] = useState<"user" | "osb" | "none">("none");
+  const [currentPage, setCurrentPage] = useState<Page>("landing");
+  const [userRole, setUserRole] = useState<UserRole>("none");
   const [currentMaterialTab, setCurrentMaterialTab] = useState<"outputs" | "inputs">("outputs");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -74,6 +90,8 @@ export default function Home() {
       co2: 590,
       savings: 1200,
       status: "pending",
+      date: "2026-05-24",
+      confidence: 0.91,
       details: { material: 90, quality: 85, env: 88, logistics: 80, economic: 85 },
     },
     {
@@ -84,7 +102,21 @@ export default function Home() {
       co2: 310,
       savings: 800,
       status: "pending",
+      date: "2026-05-20",
+      confidence: 0.68,
       details: { material: 75, quality: 70, env: 78, logistics: 60, economic: 75 },
+    },
+    {
+      id: "m-3",
+      name: "Marmara Cam Geri Kazanım",
+      score: 81,
+      distance: 21.4,
+      co2: 410,
+      savings: 950,
+      status: "completed",
+      date: "2026-04-11",
+      confidence: 0.87,
+      details: { material: 84, quality: 80, env: 82, logistics: 74, economic: 79 },
     },
   ]);
 
@@ -97,11 +129,49 @@ export default function Home() {
         "Merhaba! DöngüNet AI Sürdürülebilirlik Asistanıyım. Sınırda Karbon Düzenleme Mekanizması (SKDM - CBAM), Dijital Ürün Pasaportları (DPP) veya atık kodları hakkındaki sorularınızı cevaplayabilirim.",
     },
   ]);
+  const [chatIsTyping, setChatIsTyping] = useState(false);
 
   const [osbVerificationList, setOsbVerificationList] = useState<OSBVerification[]>([
     { id: "v-1", name: "Kocaeli Cam Sanayi", sector: "Cam Geri Kazanım", status: "pending" },
     { id: "v-2", name: "Marmara Kağıt A.Ş.", sector: "Selüloz İşleme", status: "pending" },
   ]);
+
+  // --- NOTIFICATIONS STATE ---
+  const [notifications, setNotifications] = useState<AppNotification[]>([
+    {
+      id: "n-1",
+      type: "review_required",
+      title: "Onay bekleyen eşleşme",
+      body: "Kartal Geri Dönüşüm A.Ş. eşleşmesi güven skoru düşük olduğu için uzman onayına gönderildi.",
+      read: false,
+      createdAt: nowStamp(),
+    },
+  ]);
+
+  // --- ADMIN STATE ---
+  const [platformUsers, setPlatformUsers] = useState<PlatformUser[]>([
+    { id: "u-1", name: "Umut Arda Tansever", email: "umut@gebzemetal.com", role: "user", facility: "Gebze Metal A.Ş." },
+    { id: "u-2", name: "Sehel Kayaoğlu", email: "sehel@dongunet.com", role: "admin", facility: "DöngüNet HQ" },
+    { id: "u-3", name: "Esra Badur", email: "esra@gebzeosb.gov.tr", role: "osb_manager", facility: "Gebze OSB Müdürlüğü" },
+  ]);
+
+  const [reviewQueue, setReviewQueue] = useState<ReviewQueueItem[]>([
+    {
+      id: "rq-1",
+      matchName: "Kartal Geri Dönüşüm A.Ş.",
+      confidence: 0.68,
+      reason: "Güven skoru HITL eşiği olan %80'in altında",
+      status: "pending",
+    },
+  ]);
+
+  const [weights, setWeights] = useState<WeightsConfig>({
+    material: 30,
+    quality: 20,
+    environmental: 20,
+    logistics: 15,
+    economic: 15,
+  });
 
   // --- MODALS STATE ---
   const [showOutputModal, setShowOutputModal] = useState(false);
@@ -111,10 +181,12 @@ export default function Home() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   // --- LOGIN / LOGOUT MOCKS ---
-  const handleLogin = (role: "user" | "osb") => {
+  const handleLogin = (role: "user" | "osb" | "admin") => {
     setUserRole(role);
     if (role === "osb") {
       setCurrentPage("osb");
+    } else if (role === "admin") {
+      setCurrentPage("admin");
     } else {
       setCurrentPage("dashboard");
     }
@@ -123,6 +195,22 @@ export default function Home() {
   const handleLogout = () => {
     setUserRole("none");
     setCurrentPage("landing");
+  };
+
+  // --- NOTIFICATION HANDLERS ---
+  const pushNotification = (notification: Omit<AppNotification, "id" | "read" | "createdAt">) => {
+    setNotifications((prev) => [
+      { ...notification, id: `n-${prev.length + 1}-${Date.now()}`, read: false, createdAt: nowStamp() },
+      ...prev,
+    ]);
+  };
+
+  const handleMarkNotificationRead = (id: string) => {
+    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
+  };
+
+  const handleMarkAllNotificationsRead = () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
   };
 
   // --- FORM HANDLERS ---
@@ -164,18 +252,6 @@ export default function Home() {
     const newId = `in-${inputs.length + 1}`;
     const today = new Date().toISOString().split("T")[0];
 
-    const newItem: InputItem = {
-      id: newId,
-      name: classVal, // Wait! Let's check original: name: formInName. Ah! Let's check original. Original page.tsx had: name: formInName, class: formInClass, quantity: formInQty, etc. Here we receive (name, classVal, freq, qty, specs). So we should set name: name, class: classVal, quantity: qty, frequency: freq, specs: specs, date: today.
-      class: classVal,
-      frequency: freq,
-      quantity: qty,
-      specs,
-      date: today,
-    };
-
-    // Wait! Let's double check if "name" is set to "classVal" or "name" in original.
-    // Original code: name: formInName. So we must set name: name! Let's fix that.
     const itemToAdd: InputItem = {
       id: newId,
       name: name,
@@ -192,17 +268,88 @@ export default function Home() {
 
   // --- MATCHMAKER ACTIONS ---
   const handleAcceptMatch = () => {
+    const match = matches.find((m) => m.id === selectedMatchId);
     setMatches(
       matches.map((m) => (m.id === selectedMatchId ? { ...m, status: "accepted" } : m))
     );
     setShowSuccessModal(true);
+    if (match) {
+      pushNotification({
+        type: "match_accepted",
+        title: "Eşleşme kabul edildi",
+        body: `${match.name} ile olan eşleştirme kabul edildi, iletişim bilgileri paylaşıldı.`,
+      });
+    }
   };
 
   const handleVerifyOsbFacility = (id: string) => {
+    const facility = osbVerificationList.find((v) => v.id === id);
     setOsbVerificationList(
       osbVerificationList.map((v) => (v.id === id ? { ...v, status: "approved" } : v))
     );
-    alert("Tesis başarıyla onaylandı ve OSB genel haritasına dahil edildi.");
+    if (facility) {
+      pushNotification({
+        type: "facility_verified",
+        title: "Tesis doğrulandı",
+        body: `${facility.name} tesisi başarıyla doğrulandı ve OSB genel haritasına dahil edildi.`,
+      });
+    }
+  };
+
+  // --- ADMIN ACTIONS ---
+  const handleRemoveUser = (id: string) => {
+    setPlatformUsers((prev) => prev.filter((u) => u.id !== id));
+  };
+
+  const handleApproveReview = (id: string) => {
+    setReviewQueue((prev) => prev.map((r) => (r.id === id ? { ...r, status: "approved" } : r)));
+    const item = reviewQueue.find((r) => r.id === id);
+    if (item) {
+      pushNotification({
+        type: "match_accepted",
+        title: "Uzman onayı tamamlandı",
+        body: `${item.matchName} eşleşmesi uzman incelemesinden onaylandı.`,
+      });
+    }
+  };
+
+  const handleRejectReview = (id: string) => {
+    setReviewQueue((prev) => prev.map((r) => (r.id === id ? { ...r, status: "rejected" } : r)));
+  };
+
+  const handleSaveWeights = (newWeights: WeightsConfig) => {
+    setWeights(newWeights);
+  };
+
+  // --- CHATBOT ACTIONS (paylaşılan: tam sayfa + köşe widget) ---
+  const handleChatSend = (userMsg: string) => {
+    setChatMessages((prev) => [...prev, { role: "user", content: userMsg }]);
+    setChatIsTyping(true);
+
+    setTimeout(() => {
+      setChatIsTyping(false);
+      const lower = userMsg.toLowerCase();
+      let reply =
+        "DöngüNet AI asistanı olarak sorunuzu tam olarak anlayamadım. Ancak sürdürülebilirlik, SKDM (sınırda karbon vergisi), Dijital Ürün Pasaportları (DPP) veya endüstriyel simbiyoz süreçlerimiz hakkında sorular sorabilirsiniz.";
+
+      if (lower.includes("skdm") || lower.includes("cbam") || lower.includes("karbon")) {
+        reply =
+          "<strong>Sınırda Karbon Düzenleme Mekanizması (SKDM - CBAM) Hakkında:</strong> AB Yeşil Mutabakatı kapsamında, birlik dışından ithal edilen çimento, demir-çelik, alüminyum, gübre, hidrojen ve elektrik gibi ürünlerin gömülü karbon emisyonlarına göre gümrükte vergilendirilmesidir. DöngüNet üzerinde yaptığınız atık eşleştirmeleri, birincil (virgin) metal kullanımı yerine ikincil alaşım kullanımı sağladığı için gömülü karbon miktarınızı önemli ölçüde azaltır ve yasal uyumluluk raporu (CBAM Raporu) olarak çıktı alınabilir.";
+      } else if (lower.includes("pasaport") || lower.includes("dpp") || lower.includes("espr")) {
+        reply =
+          "<strong>Dijital Ürün Pasaportu (DPP) Nedir?</strong> AB'nin Ecodesign for Sustainable Products Regulation (ESPR) yönetmeliğine göre ürünlerin malzeme kimliği, saflığı, menşei, karbon ayak izi ve geri dönüştürülebilirlik durumunu dijital olarak barındıran yapıdır. DöngüNet'te oluşturduğumuz pasaportlar, atığınızın değerini kanıtlar ve izlenebilirlik sağlayan benzersiz bir QR Kod ile üretilir.";
+      } else if (
+        lower.includes("simbiyoz") ||
+        lower.includes("eşleştirme") ||
+        lower.includes("nasıl") ||
+        lower.includes("skor")
+      ) {
+        reply =
+          "<strong>DöngüNet AI Eşleştirme Sistemi:</strong> Tesislerimizin sisteme girdiği çıktılar ile diğer tesislerin girdileri arasında anlamsal S-BERT analizi yapılır (benzerlik limiti $\\ge 0.60$). Eşleşen adaylar; <strong>Malzeme Uyumu (%30)</strong>, <strong>Kalite Uyumu (%20)</strong>, <strong>Çevresel Kazanç (%20)</strong>, <strong>Lojistik (%15)</strong> ve <strong>Ekonomik Fayda (%15)</strong> olmak üzere 5 farklı ağırlık üzerinden AHP (Analitik Hiyerarşi Süreci) algoritmasıyla puanlanarak listelenir.";
+      }
+
+      setChatMessages((prev) => [...prev, { role: "assistant", content: reply }]);
+    }, 1500);
   };
 
   const selectedMatch = matches.find((m) => m.id === selectedMatchId) || matches[0];
@@ -236,7 +383,14 @@ export default function Home() {
           {/* Right Main Content */}
           <div className="flex-grow pl-0 lg:pl-64 flex flex-col min-h-screen w-full min-w-0">
             {/* Header */}
-            <Header userRole={userRole} currentPage={currentPage} setSidebarOpen={setSidebarOpen} />
+            <Header
+              userRole={userRole}
+              currentPage={currentPage}
+              setSidebarOpen={setSidebarOpen}
+              notifications={notifications}
+              onMarkRead={handleMarkNotificationRead}
+              onMarkAllRead={handleMarkAllNotificationsRead}
+            />
 
             {/* View Panels */}
             <main className="flex-grow p-4 md:p-8 bg-slate-950 relative overflow-y-auto">
@@ -276,7 +430,7 @@ export default function Home() {
               {currentPage === "reports" && <ReportsView />}
 
               {currentPage === "chatbot" && (
-                <ChatbotView chatMessages={chatMessages} setChatMessages={setChatMessages} />
+                <ChatbotView chatMessages={chatMessages} onSend={handleChatSend} isTyping={chatIsTyping} />
               )}
 
               {currentPage === "osb" && (
@@ -285,9 +439,26 @@ export default function Home() {
                   onVerifyFacility={handleVerifyOsbFacility}
                 />
               )}
+
+              {currentPage === "admin" && (
+                <AdminView
+                  users={platformUsers}
+                  onRemoveUser={handleRemoveUser}
+                  reviewQueue={reviewQueue}
+                  onApproveReview={handleApproveReview}
+                  onRejectReview={handleRejectReview}
+                  weights={weights}
+                  onSaveWeights={handleSaveWeights}
+                />
+              )}
             </main>
           </div>
         </div>
+      )}
+
+      {/* ================= FLOATING CHAT WIDGET ================= */}
+      {currentPage !== "landing" && currentPage !== "chatbot" && (
+        <ChatWidget chatMessages={chatMessages} onSend={handleChatSend} isTyping={chatIsTyping} />
       )}
 
       {/* ================= MODAL WINDOWS ================= */}

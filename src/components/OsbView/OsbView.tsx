@@ -67,8 +67,20 @@ export default function OsbView({ osbVerificationList, onVerifyFacility }: OsbVi
                 <pattern id="osb-grid" width="30" height="30" patternUnits="userSpaceOnUse">
                   <path d="M 30 0 L 0 0 0 30" fill="none" stroke="rgba(255,255,255,0.02)" strokeWidth={1} />
                 </pattern>
+                <radialGradient id="heat-high" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="rgba(16, 185, 129, 0.35)" />
+                  <stop offset="100%" stopColor="rgba(16, 185, 129, 0)" />
+                </radialGradient>
+                <radialGradient id="heat-mid" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="rgba(52, 211, 153, 0.22)" />
+                  <stop offset="100%" stopColor="rgba(52, 211, 153, 0)" />
+                </radialGradient>
               </defs>
               <rect width="100%" height="100%" fill="url(#osb-grid)" />
+              {/* Isı haritası katmanı: tesis akış yoğunluğuna göre simüle edilmiştir */}
+              <circle cx={120} cy={120} r={70} fill="url(#heat-high)" />
+              <circle cx={380} cy={140} r={55} fill="url(#heat-high)" />
+              <circle cx={220} cy={200} r={45} fill="url(#heat-mid)" />
               <polygon
                 points="50,40 550,20 580,240 120,290"
                 fill="none"

@@ -25,6 +25,10 @@ export default function MatchmakerView({
   const [rejectPanelOpen, setRejectPanelOpen] = useState(false);
   const [rejectReasonText, setRejectReasonText] = useState("");
 
+  const [viewMode, setViewMode] = useState<"board" | "history">("board");
+  const [historyFilter, setHistoryFilter] = useState<"all" | "accepted" | "rejected" | "completed">("all");
+  const [historySort, setHistorySort] = useState<"date_desc" | "date_asc" | "score_desc" | "score_asc">("date_desc");
+
   const selectedMatch = matches.find((m) => m.id === selectedMatchId) || matches[0];
 
   // --- DRAWING RADAR CHART ---
@@ -188,10 +192,143 @@ export default function MatchmakerView({
     setRejectReasonText("");
   };
 
+  const statusLabel = (status: MatchCandidate["status"]) =>
+    status === "accepted"
+      ? "Kabul Edildi"
+      : status === "rejected"
+      ? "Reddedildi"
+      : status === "completed"
+      ? "Tamamlandı"
+      : "Onay Bekliyor";
+
+  const historyRows = matches
+    .filter((m) => m.status !== "pending")
+    .filter((m) => historyFilter === "all" || m.status === historyFilter)
+    .sort((a, b) => {
+      if (historySort === "date_desc") return b.date.localeCompare(a.date);
+      if (historySort === "date_asc") return a.date.localeCompare(b.date);
+      if (historySort === "score_desc") return b.score - a.score;
+      return a.score - b.score;
+    });
+
+  const handleExportCsv = () => {
+    const header = ["Tesis", "Tarih", "Skor", "Durum", "CO2 Tasarrufu (kg)", "Tasarruf (EUR)"];
+    const rows = historyRows.map((m) => [m.name, m.date, m.score, statusLabel(m.status), m.co2, m.savings]);
+    const csv = [header, ...rows].map((row) => row.map((cell) => `"${cell}"`).join(",")).join("\n");
+    const blob = new Blob([`﻿${csv}`], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "esleztirme-gecmisi.csv";
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
-    <div className={styles.container}>
-      {/* Left Column: Candidates */}
-      <div className="lg:col-span-5 flex flex-col gap-4">
+    <div className="flex flex-col gap-4">
+      <div className="flex gap-2 p-1 rounded-xl bg-slate-900 border border-white/5 self-start">
+        <button
+          onClick={() => setViewMode("board")}
+          className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+            viewMode === "board" ? "text-white bg-slate-700" : "text-on-surface-variant hover:text-white"
+          }`}
+        >
+          Eşleştirme Panosu
+        </button>
+        <button
+          onClick={() => setViewMode("history")}
+          className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+            viewMode === "history" ? "text-white bg-slate-700" : "text-on-surface-variant hover:text-white"
+          }`}
+        >
+          Eşleştirme Geçmişi
+        </button>
+      </div>
+
+      {viewMode === "history" ? (
+        <div className="glass-panel rounded-2xl overflow-hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 border-b border-white/5">
+            <div className="flex gap-3">
+              <select
+                value={historyFilter}
+                onChange={(e) => setHistoryFilter(e.target.value as typeof historyFilter)}
+                className="bg-slate-900 border border-white/10 rounded-lg text-xs px-3 py-2 text-white focus:outline-none focus:border-accent-mint"
+              >
+                <option value="all">Tüm Durumlar</option>
+                <option value="accepted">Kabul Edildi</option>
+                <option value="rejected">Reddedildi</option>
+                <option value="completed">Tamamlandı</option>
+              </select>
+              <select
+                value={historySort}
+                onChange={(e) => setHistorySort(e.target.value as typeof historySort)}
+                className="bg-slate-900 border border-white/10 rounded-lg text-xs px-3 py-2 text-white focus:outline-none focus:border-accent-mint"
+              >
+                <option value="date_desc">Tarih (Yeni → Eski)</option>
+                <option value="date_asc">Tarih (Eski → Yeni)</option>
+                <option value="score_desc">Skor (Yüksek → Düşük)</option>
+                <option value="score_asc">Skor (Düşük → Yüksek)</option>
+              </select>
+            </div>
+            <button
+              onClick={handleExportCsv}
+              disabled={historyRows.length === 0}
+              className="btn-secondary px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <span className="material-symbols-outlined text-[16px]">download</span>
+              CSV Dışa Aktar
+            </button>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="text-[10px] font-bold text-on-surface-variant uppercase bg-slate-900/40">
+                  <th className="px-5 py-3">Tesis</th>
+                  <th className="px-5 py-3">Tarih</th>
+                  <th className="px-5 py-3">Skor</th>
+                  <th className="px-5 py-3">CO2 Tasarrufu</th>
+                  <th className="px-5 py-3">Tasarruf</th>
+                  <th className="px-5 py-3 text-right">Durum</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5 text-sm text-white">
+                {historyRows.map((m) => (
+                  <tr key={m.id}>
+                    <td className="px-5 py-3 font-semibold">{m.name}</td>
+                    <td className="px-5 py-3 text-on-surface-variant text-xs">{m.date}</td>
+                    <td className="px-5 py-3 text-accent-mint font-bold">{m.score}%</td>
+                    <td className="px-5 py-3 text-xs text-teal-400">{m.co2} kg</td>
+                    <td className="px-5 py-3 text-xs text-accent-mint">€{m.savings.toLocaleString()}</td>
+                    <td className="px-5 py-3 text-right">
+                      <span
+                        className={`px-2 py-0.5 rounded border font-bold tracking-wider uppercase text-[8px] ${
+                          m.status === "accepted"
+                            ? "bg-accent-mint/10 text-accent-mint border-accent-mint/20"
+                            : m.status === "rejected"
+                            ? "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                            : "bg-sky-500/10 text-sky-400 border-sky-500/20"
+                        }`}
+                      >
+                        {statusLabel(m.status)}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+                {historyRows.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="px-5 py-8 text-center text-xs text-on-surface-variant">
+                      Geçmişte eşleştirme kaydı yok.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : (
+        <div className={styles.container}>
+          {/* Left Column: Candidates */}
+          <div className="lg:col-span-5 flex flex-col gap-4">
         <div className="glass-panel p-5 rounded-2xl">
           <h3 className="font-title font-bold text-white text-base">Eşleştirme Adayları</h3>
           <p className="text-xs text-on-surface-variant mt-1">
@@ -232,10 +369,12 @@ export default function MatchmakerView({
                       ? "bg-accent-mint/10 text-accent-mint border-accent-mint/20"
                       : m.status === "rejected"
                       ? "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                      : m.status === "completed"
+                      ? "bg-sky-500/10 text-sky-400 border-sky-500/20"
                       : "bg-amber-500/10 text-amber-400 border-amber-500/20"
                   }`}
                 >
-                  {m.status === "accepted" ? "Kabul Edildi" : m.status === "rejected" ? "Reddedildi" : "Onay Bekliyor"}
+                  {statusLabel(m.status)}
                 </span>
               </div>
             </div>
@@ -340,6 +479,8 @@ export default function MatchmakerView({
           )}
         </div>
       </div>
+        </div>
+      )}
     </div>
   );
 }

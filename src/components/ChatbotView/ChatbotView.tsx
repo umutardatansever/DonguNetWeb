@@ -6,53 +6,25 @@ import { ChatMessage } from "../../types";
 
 interface ChatbotViewProps {
   chatMessages: ChatMessage[];
-  setChatMessages: React.Dispatch<React.SetStateAction<ChatMessage[]>>;
+  onSend: (message: string) => void;
+  isTyping: boolean;
 }
 
-export default function ChatbotView({ chatMessages, setChatMessages }: ChatbotViewProps) {
+export default function ChatbotView({ chatMessages, onSend, isTyping }: ChatbotViewProps) {
   const [chatInput, setChatInput] = useState("");
-  const [chatIsTyping, setChatIsTyping] = useState(false);
   const chatMessagesEndRef = useRef<HTMLDivElement | null>(null);
 
   const handleChatSend = () => {
     if (!chatInput.trim()) return;
-
-    const userMsg = chatInput.trim();
-    setChatMessages((prev) => [...prev, { role: "user", content: userMsg }]);
+    onSend(chatInput.trim());
     setChatInput("");
-    setChatIsTyping(true);
-
-    setTimeout(() => {
-      setChatIsTyping(false);
-      const lower = userMsg.toLowerCase();
-      let reply =
-        "DöngüNet AI asistanı olarak sorunuzu tam olarak anlayamadım. Ancak sürdürülebilirlik, SKDM (sınırda karbon vergisi), Dijital Ürün Pasaportları (DPP) veya endüstriyel simbiyoz süreçlerimiz hakkında sorular sorabilirsiniz.";
-
-      if (lower.includes("skdm") || lower.includes("cbam") || lower.includes("karbon")) {
-        reply =
-          "<strong>Sınırda Karbon Düzenleme Mekanizması (SKDM - CBAM) Hakkında:</strong> AB Yeşil Mutabakatı kapsamında, birlik dışından ithal edilen çimento, demir-çelik, alüminyum, gübre, hidrojen ve elektrik gibi ürünlerin gömülü karbon emisyonlarına göre gümrükte vergilendirilmesidir. DöngüNet üzerinde yaptığınız atık eşleştirmeleri, birincil (virgin) metal kullanımı yerine ikincil alaşım kullanımı sağladığı için gömülü karbon miktarınızı önemli ölçüde azaltır ve yasal uyumluluk raporu (CBAM Raporu) olarak çıktı alınabilir.";
-      } else if (lower.includes("pasaport") || lower.includes("dpp") || lower.includes("espr")) {
-        reply =
-          "<strong>Dijital Ürün Pasaportu (DPP) Nedir?</strong> AB'nin Ecodesign for Sustainable Products Regulation (ESPR) yönetmeliğine göre ürünlerin malzeme kimliği, saflığı, menşei, karbon ayak izi ve geri dönüştürülebilirlik durumunu dijital olarak barındıran yapıdır. DöngüNet'te oluşturduğumuz pasaportlar, atığınızın değerini kanıtlar ve izlenebilirlik sağlayan benzersiz bir QR Kod ile üretilir.";
-      } else if (
-        lower.includes("simbiyoz") ||
-        lower.includes("eşleştirme") ||
-        lower.includes("nasıl") ||
-        lower.includes("skor")
-      ) {
-        reply =
-          "<strong>DöngüNet AI Eşleştirme Sistemi:</strong> Tesislerimizin sisteme girdiği çıktılar ile diğer tesislerin girdileri arasında anlamsal S-BERT analizi yapılır (benzerlik limiti $\\ge 0.65$). Eşleşen adaylar; <strong>Malzeme Uyumu (%30)</strong>, <strong>Kalite Uyumu (%20)</strong>, <strong>Çevresel Kazanç (%20)</strong>, <strong>Lojistik (%15)</strong> ve <strong>Ekonomik Fayda (%15)</strong> olmak üzere 5 farklı ağırlık üzerinden AHP (Analitik Hiyerarşi Süreci) algoritmasıyla puanlanarak listelenir.";
-      }
-
-      setChatMessages((prev) => [...prev, { role: "assistant", content: reply }]);
-    }, 1500);
   };
 
   useEffect(() => {
     if (chatMessagesEndRef.current) {
       chatMessagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [chatMessages, chatIsTyping]);
+  }, [chatMessages, isTyping]);
 
   return (
     <div className={`glass-panel rounded-2xl overflow-hidden ${styles.container}`}>
@@ -94,7 +66,7 @@ export default function ChatbotView({ chatMessages, setChatMessages }: ChatbotVi
           </div>
         ))}
 
-        {chatIsTyping && (
+        {isTyping && (
           <div className="flex gap-3 max-w-[80%] self-start">
             <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-accent-mint/10 text-accent-mint border border-accent-mint/20">
               <span className="material-symbols-outlined text-[16px]">smart_toy</span>
