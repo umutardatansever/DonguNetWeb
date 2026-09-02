@@ -10,12 +10,16 @@ interface NotificationCenterProps {
   onMarkAllRead: () => void;
 }
 
-const ICONS: Record<AppNotification["type"], string> = {
+const ICONS: Record<string, string> = {
   match_accepted: "handshake",
   match_rejected: "cancel",
+  match_expired: "schedule",
   review_required: "pending_actions",
   facility_verified: "verified",
+  classification_approved: "check_circle",
+  classification_rejected: "cancel",
 };
+const DEFAULT_ICON = "notifications";
 
 export default function NotificationCenter({ notifications, onMarkRead, onMarkAllRead }: NotificationCenterProps) {
   const [open, setOpen] = useState(false);
@@ -70,7 +74,7 @@ export default function NotificationCenter({ notifications, onMarkRead, onMarkAl
                 className={`${styles.item} ${!n.read ? styles.itemUnread : ""}`}
               >
                 <span className="material-symbols-outlined text-accent-mint text-[18px] shrink-0 mt-0.5">
-                  {ICONS[n.type]}
+                  {ICONS[n.type] ?? DEFAULT_ICON}
                 </span>
                 <div className="flex flex-col gap-0.5 min-w-0 text-left">
                   <span className="text-xs font-semibold text-on-surface truncate">{n.title}</span>

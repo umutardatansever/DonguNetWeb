@@ -10,6 +10,7 @@ interface MatchmakerViewProps {
   selectedMatchId: string;
   setSelectedMatchId: (id: string) => void;
   onAcceptMatch: () => void;
+  onRejectMatch: (reasonCategory: string, reasonText: string) => void;
 }
 
 export default function MatchmakerView({
@@ -18,6 +19,7 @@ export default function MatchmakerView({
   selectedMatchId,
   setSelectedMatchId,
   onAcceptMatch,
+  onRejectMatch,
 }: MatchmakerViewProps) {
   const radarCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -187,7 +189,7 @@ export default function MatchmakerView({
   };
 
   const handleConfirmRejectMatch = () => {
-    setMatches(matches.map((m) => (m.id === selectedMatchId ? { ...m, status: "rejected" } : m)));
+    onRejectMatch("other", rejectReasonText);
     setRejectPanelOpen(false);
     setRejectReasonText("");
   };
@@ -199,6 +201,8 @@ export default function MatchmakerView({
       ? "Reddedildi"
       : status === "completed"
       ? "Tamamlandı"
+      : status === "expired"
+      ? "Süresi Doldu"
       : "Onay Bekliyor";
 
   const historyRows = matches
@@ -354,7 +358,7 @@ export default function MatchmakerView({
               <div className="flex justify-between items-start">
                 <div>
                   <h4 className="font-title font-bold text-on-surface text-sm">{m.name}</h4>
-                  <span className="text-[10px] text-on-surface-variant block mt-1">Lojistik Mesafe: {m.distance} km</span>
+                  <span className="text-[10px] text-on-surface-variant block mt-1">Lojistik Mesafe: {m.distanceKm !== null ? `${m.distanceKm} km` : "Bilinmiyor"}</span>
                 </div>
                 <span className="text-base font-extrabold font-title text-accent-mint">{m.score}% Uyum</span>
               </div>
@@ -415,7 +419,7 @@ export default function MatchmakerView({
               <span className="text-[10px] text-on-surface-variant font-bold uppercase tracking-wider block">
                 Lojistik Mesafe
               </span>
-              <span className="text-lg font-bold text-on-surface mt-1 block">{selectedMatch.distance} km</span>
+              <span className="text-lg font-bold text-on-surface mt-1 block">{selectedMatch.distanceKm !== null ? `${selectedMatch.distanceKm} km` : "Bilinmiyor"}</span>
             </div>
             <div className="p-4 rounded-xl bg-teal-600/5 border border-teal-600/15">
               <span className="text-[10px] text-teal-700 font-bold uppercase tracking-wider block">

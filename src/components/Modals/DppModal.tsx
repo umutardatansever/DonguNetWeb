@@ -13,11 +13,9 @@ interface DppModalProps {
 export default function DppModal({ isOpen, onClose, output }: DppModalProps) {
   if (!isOpen || !output) return null;
 
-  const handlePdfDownload = (name: string) => {
-    alert(`${name}.pdf simüle edilmiş şekilde derleniyor ve indirme kuyruğuna alınıyor.`);
-  };
+  const hasRealPassport = Boolean(output.qrCode && output.pdfUrl);
 
-  // --- SVG QR CODE GENERATION ---
+  // --- SVG QR CODE GENERATION (yalnızca gerçek QR bilinmeyen geçmiş kayıtlar için yer tutucu) ---
   const drawMockSvgQrCode = () => {
     return (
       <svg viewBox="0 0 100 100" className="w-full h-full text-on-surface" fill="currentColor">
@@ -82,7 +80,9 @@ export default function DppModal({ isOpen, onClose, output }: DppModalProps) {
             <div className="grid grid-cols-2 gap-4 text-xs">
               <div className="p-3 bg-surface-light/60 rounded-xl border border-border-color">
                 <span className="text-[10px] text-on-surface-variant uppercase block">Pasaport ID</span>
-                <span className="font-mono text-on-surface mt-1 block">{output.dppId}</span>
+                <span className="font-mono text-on-surface mt-1 block">
+                  {output.dppId ?? "Bu oturumda oluşturulmamış kayıtlar için pasaport ID listelenmiyor"}
+                </span>
               </div>
               <div className="p-3 bg-surface-light/60 rounded-xl border border-border-color">
                 <span className="text-[10px] text-on-surface-variant uppercase block">Bileşim</span>
@@ -100,18 +100,42 @@ export default function DppModal({ isOpen, onClose, output }: DppModalProps) {
           </div>
 
           <div className="md:col-span-4 flex flex-col items-center justify-center p-4 bg-white rounded-2xl aspect-square w-full max-w-[180px] mx-auto border border-border-color">
-            <div className="w-full h-full text-on-surface">{drawMockSvgQrCode()}</div>
+            {output.qrCode ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={output.qrCode} alt="Pasaport QR kodu" className="w-full h-full object-contain" />
+            ) : (
+              <div className="w-full h-full text-on-surface">{drawMockSvgQrCode()}</div>
+            )}
           </div>
         </div>
 
+        {!hasRealPassport && (
+          <p className="text-[11px] text-amber-700 bg-amber-500/10 border border-amber-500/20 rounded-xl px-3 py-2">
+            Bu kayıt mevcut oturumda oluşturulmadığı için gerçek QR/PDF bağlantısı bilinmiyor (backend `GET
+            /materials/outputs` pasaport ilişkisini döndürmüyor) — yukarıdaki QR yer tutucudur.
+          </p>
+        )}
+
         <div className="flex gap-4 border-t border-border-color pt-6">
-          <button
-            onClick={() => handlePdfDownload("Dijital Urun Pasaportu")}
-            className="btn-primary flex-grow py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 cursor-pointer"
-          >
-            <span className="material-symbols-outlined text-[18px]">download_for_offline</span>
-            Pasaport Raporunu İndir (PDF)
-          </button>
+          {output.pdfUrl ? (
+            <a
+              href={output.pdfUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary flex-grow py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[18px]">download_for_offline</span>
+              Pasaport Raporunu İndir (PDF)
+            </a>
+          ) : (
+            <button
+              disabled
+              className="flex-grow py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 opacity-40 cursor-not-allowed bg-surface-light border border-border-color text-on-surface-variant"
+            >
+              <span className="material-symbols-outlined text-[18px]">download_for_offline</span>
+              PDF Bağlantısı Bilinmiyor
+            </button>
+          )}
           <button onClick={onClose} className="btn-secondary px-6 py-3 rounded-xl text-xs font-bold cursor-pointer">
             Kapat
           </button>

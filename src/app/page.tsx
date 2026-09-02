@@ -1,6 +1,33 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import {
+  authApi,
+  materialsApi,
+  matchesApi,
+  adminApi,
+  reviewQueueApi,
+  notificationsApi,
+  osbDashboardApi,
+  healthApi,
+  facilitiesApi,
+  ApiError,
+  OutputRow,
+  InputRow,
+  MatchRow,
+  NotificationRow,
+  AdminUserRow,
+  ReviewQueueRow,
+  FacilityVerificationRow,
+  OsbStats,
+  OsbFacilityRow,
+  OsbMapResponse,
+  ApiKeyRow,
+  FacilityMe,
+  FacilityDocumentRow,
+} from "@/lib/api";
+import { getAccessToken, saveAccessToken, clearTokens, ROLE_MAP } from "@/lib/session";
+import { connectNotificationsSocket, disconnectNotificationsSocket, NotificationSocketEvent } from "@/lib/notificationsSocket";
 import {
   OutputItem,
   InputItem,
@@ -38,6 +65,126 @@ type Page = "landing" | "dashboard" | "materials" | "matchmaker" | "reports" | "
 const nowStamp = () =>
   new Date().toLocaleString("tr-TR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
 
+const formatStamp = (iso: string | null) => {
+  if (!iso) return nowStamp();
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return nowStamp();
+  return d.toLocaleString("tr-TR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+};
+
+// "Al %95, Fe %2" gibi serbest metinleri {Al: 95, Fe: 2} şekline çeviren, elden geldiğince
+// doğru çalışan bir ayrıştırıcı (CreateOutputDto.composition alanı için). AddOutputModal
+// yalnızca tek bir serbest metin alanı topladığından (yapılandırılmış bir kompozisyon
+// tablosu değil), bu kesin doğruluk garantisi olmayan bir sezgisel ayrıştırmadır.
+function parseComposition(text: string): Record<string, number> | undefined {
+  const result: Record<string, number> = {};
+  for (const part of text.split(",")) {
+    const match = part.match(/([A-Za-zÇĞİÖŞÜçğıöşü]+)\s*%?\s*(\d+(?:\.\d+)?)/);
+    if (match) result[match[1].trim()] = Number(match[2]);
+  }
+  return Object.keys(result).length > 0 ? result : undefined;
+}
+
+// ── Backend satırlarını frontend view-model'lerine çeviren mapper'lar ──────────────────────────
+
+function mapOutput(o: OutputRow): OutputItem {
+  return {
+    id: o.id,
+    name: o.description,
+    class: (o.materialClass ?? "BELİRSİZ").toUpperCase(),
+    quantity: Number(o.quantityKg),
+    stock: Number(o.stock),
+    composition: o.composition ? Object.entries(o.composition).map(([k, v]) => `${k} %${v}`).join(", ") : "-",
+    date: (o.createdAt ?? "").slice(0, 10),
+    dppId: null, // list endpoint pasaport ilişkisini içermiyor, bkz. types.ts notu
+    qrCode: null,
+    pdfUrl: null,
+  };
+}
+
+function mapInput(i: InputRow): InputItem {
+  return {
+    id: i.id,
+    name: i.description,
+    class: (i.materialClass ?? "BELİRSİZ").toUpperCase(),
+    quantity: Number(i.quantityKg),
+    frequency: i.frequency ?? "-",
+    specs: i.specs ? JSON.stringify(i.specs) : "-",
+    date: (i.createdAt ?? "").slice(0, 10),
+  };
+}
+
+function mapMatch(m: MatchRow): MatchCandidate {
+  return {
+    id: m.id,
+    name: m.counterparty.osbName ?? m.counterparty.sectorLabel ?? "Bilinmeyen Tesis",
+    score: m.totalScore,
+    distanceKm: null, // GET /matches yanıtında yok, bkz. types.ts notu
+    co2: m.co2Saved !== null ? Number(m.co2Saved) : 0,
+    savings: m.cbamImpact !== null ? Number(m.cbamImpact) : 0,
+    status: (m.status.toLowerCase() as MatchCandidate["status"]) ?? "pending",
+    date: (m.createdAt ?? "").slice(0, 10),
+    details: {
+      material: m.breakdown?.material ?? 0,
+      quality: m.breakdown?.quality ?? 0,
+      env: m.breakdown?.environmental ?? 0,
+      logistics: m.breakdown?.logistics ?? 0,
+      economic: m.breakdown?.economic ?? 0,
+    },
+  };
+}
+
+function mapNotification(n: NotificationRow): AppNotification {
+  return {
+    id: n.id,
+    type: n.type,
+    title: n.title,
+    body: n.body ?? "",
+    read: n.readAt !== null,
+    createdAt: formatStamp(n.createdAt),
+  };
+}
+
+function mapSocketNotification(n: NotificationSocketEvent): AppNotification {
+  return {
+    id: n.id,
+    type: n.type,
+    title: n.title,
+    body: n.body ?? "",
+    read: false,
+    createdAt: formatStamp(n.created_at),
+  };
+}
+
+function mapUser(u: AdminUserRow): PlatformUser {
+  return {
+    id: u.id,
+    name: u.contactName ?? u.email,
+    email: u.email,
+    role: u.role,
+    facility: u.facilityId,
+  };
+}
+
+function mapReviewQueueRow(r: ReviewQueueRow): ReviewQueueItem {
+  return {
+    id: r.id,
+    matchName: r.output?.description ?? "Bilinmeyen Kayıt",
+    confidence: Number(r.confidence),
+    reason: r.reason,
+    status: r.status.toLowerCase() as ReviewQueueItem["status"],
+  };
+}
+
+function mapVerification(v: FacilityVerificationRow): OSBVerification {
+  return {
+    id: v.id,
+    name: v.facility.name,
+    sector: v.facility.sector,
+    status: v.status.toLowerCase() as OSBVerification["status"],
+  };
+}
+
 export default function Home() {
   // --- CORE ROUTING STATE ---
   const [currentPage, setCurrentPage] = useState<Page>("landing");
@@ -45,82 +192,13 @@ export default function Home() {
   const [currentMaterialTab, setCurrentMaterialTab] = useState<"outputs" | "inputs">("outputs");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // --- MOCK DATABASE STATE ---
-  const [outputs, setOutputs] = useState<OutputItem[]>([
-    {
-      id: "out-1",
-      name: "Alüminyum Alaşımlı Toz",
-      class: "METAL",
-      quantity: 1200,
-      stock: 1200,
-      composition: "Fe %71, Al %16",
-      date: "2026-05-24",
-      dppId: "DPP-US-0091-23",
-    },
-    {
-      id: "out-2",
-      name: "Atık PET Çapak",
-      class: "PLASTIC",
-      quantity: 3000,
-      stock: 3000,
-      composition: "PET %100",
-      date: "2026-05-24",
-      dppId: "DPP-US-1021-99",
-    },
-  ]);
-
-  const [inputs, setInputs] = useState<InputItem[]>([
-    {
-      id: "in-1",
-      name: "Krom Tozu H-4",
-      class: "METAL",
-      quantity: 2500,
-      frequency: "Aylık",
-      specs: "Saflık > %92",
-      date: "2026-05-24",
-    },
-  ]);
-
-  const [matches, setMatches] = useState<MatchCandidate[]>([
-    {
-      id: "m-1",
-      name: "Dilovası Alüminyum Döküm (Fabrika B)",
-      score: 86,
-      distance: 14.2,
-      co2: 590,
-      savings: 1200,
-      status: "pending",
-      date: "2026-05-24",
-      confidence: 0.91,
-      details: { material: 90, quality: 85, env: 88, logistics: 80, economic: 85 },
-    },
-    {
-      id: "m-2",
-      name: "Kartal Geri Dönüşüm A.Ş.",
-      score: 72,
-      distance: 35.1,
-      co2: 310,
-      savings: 800,
-      status: "pending",
-      date: "2026-05-20",
-      confidence: 0.68,
-      details: { material: 75, quality: 70, env: 78, logistics: 60, economic: 75 },
-    },
-    {
-      id: "m-3",
-      name: "Marmara Cam Geri Kazanım",
-      score: 81,
-      distance: 21.4,
-      co2: 410,
-      savings: 950,
-      status: "completed",
-      date: "2026-04-11",
-      confidence: 0.87,
-      details: { material: 84, quality: 80, env: 82, logistics: 74, economic: 79 },
-    },
-  ]);
-
-  const [selectedMatchId, setSelectedMatchId] = useState<string>("m-1");
+  // --- GERÇEK BACKEND'DEN BESLENEN STATE (aşağıdaki useEffect ile çekilir, eski mock dizilerin yerini alır) ---
+  const [facility, setFacility] = useState<FacilityMe | null>(null);
+  const [facilityDocuments, setFacilityDocuments] = useState<FacilityDocumentRow[]>([]);
+  const [outputs, setOutputs] = useState<OutputItem[]>([]);
+  const [inputs, setInputs] = useState<InputItem[]>([]);
+  const [matches, setMatches] = useState<MatchCandidate[]>([]);
+  const [selectedMatchId, setSelectedMatchId] = useState<string>("");
 
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
     {
@@ -131,40 +209,28 @@ export default function Home() {
   ]);
   const [chatIsTyping, setChatIsTyping] = useState(false);
 
-  const [osbVerificationList, setOsbVerificationList] = useState<OSBVerification[]>([
-    { id: "v-1", name: "Kocaeli Cam Sanayi", sector: "Cam Geri Kazanım", status: "pending" },
-    { id: "v-2", name: "Marmara Kağıt A.Ş.", sector: "Selüloz İşleme", status: "pending" },
-  ]);
+  // Backend'de OSB'ye özel bir doğrulama endpoint'i yok (yalnızca /admin/verifications
+  // üzerinden ADMIN, bkz. admin.controller.ts @Roles(ADMIN)) -- bir OSB_MANAGER oturumu
+  // bu çağrıda 403 alır ve osbVerificationList boş kalır.
+  const [osbVerificationList, setOsbVerificationList] = useState<OSBVerification[]>([]);
+  const [osbStats, setOsbStats] = useState<OsbStats | null>(null);
+  const [osbFacilities, setOsbFacilities] = useState<OsbFacilityRow[]>([]);
+  const [osbMap, setOsbMap] = useState<OsbMapResponse | null>(null);
+
+  // --- SİSTEM SAĞLIĞI (H2) -- /health/ready periyodik kontrol, DB/AI/Redis erişilemezse banner ---
+  const [systemDown, setSystemDown] = useState(false);
 
   // --- NOTIFICATIONS STATE ---
-  const [notifications, setNotifications] = useState<AppNotification[]>([
-    {
-      id: "n-1",
-      type: "review_required",
-      title: "Onay bekleyen eşleşme",
-      body: "Kartal Geri Dönüşüm A.Ş. eşleşmesi güven skoru düşük olduğu için uzman onayına gönderildi.",
-      read: false,
-      createdAt: nowStamp(),
-    },
-  ]);
+  const [notifications, setNotifications] = useState<AppNotification[]>([]);
 
   // --- ADMIN STATE ---
-  const [platformUsers, setPlatformUsers] = useState<PlatformUser[]>([
-    { id: "u-1", name: "Umut Arda Tansever", email: "umut@gebzemetal.com", role: "user", facility: "Gebze Metal A.Ş." },
-    { id: "u-2", name: "Sehel Kayaoğlu", email: "sehel@dongunet.com", role: "admin", facility: "DöngüNet HQ" },
-    { id: "u-3", name: "Esra Badur", email: "esra@gebzeosb.gov.tr", role: "osb_manager", facility: "Gebze OSB Müdürlüğü" },
-  ]);
+  const [platformUsers, setPlatformUsers] = useState<PlatformUser[]>([]);
+  const [reviewQueue, setReviewQueue] = useState<ReviewQueueItem[]>([]);
+  const [apiKeys, setApiKeys] = useState<ApiKeyRow[]>([]);
 
-  const [reviewQueue, setReviewQueue] = useState<ReviewQueueItem[]>([
-    {
-      id: "rq-1",
-      matchName: "Kartal Geri Dönüşüm A.Ş.",
-      confidence: 0.68,
-      reason: "Güven skoru HITL eşiği olan %80'in altında",
-      status: "pending",
-    },
-  ]);
-
+  // GET/POST /v1/admin/weights + POST .../:id/activate gerçek uçlar (Faz 3.5) --
+  // aşağıdaki veri yükleme useEffect'i aktif versiyonu çekip bunu günceller; bu
+  // sadece ilk boyama için varsayılan/yer tutucu değer.
   const [weights, setWeights] = useState<WeightsConfig>({
     material: 30,
     quality: 20,
@@ -180,7 +246,7 @@ export default function Home() {
   const [selectedDppOutput, setSelectedDppOutput] = useState<OutputItem | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  // --- LOGIN / LOGOUT MOCKS ---
+  // --- LOGIN / LOGOUT ---
   const handleLogin = (role: "user" | "osb" | "admin") => {
     setUserRole(role);
     if (role === "osb") {
@@ -192,136 +258,441 @@ export default function Home() {
     }
   };
 
+  // --- OTURUM GERİ YÜKLEME ---
+  // Access token artık yalnızca 1 saat ömürlü ve refresh token httpOnly cookie'de
+  // (K-18) -- localStorage'da hiç görünmüyor. Bu yüzden sayfa her açıldığında önce
+  // sessizce /auth/refresh çağrılır (cookie credentials:'include' ile otomatik
+  // taşınır); başarılıysa yeni access token saklanıp /auth/me ile oturum geri
+  // yüklenir. Refresh de başarısızsa (cookie yok/süresi dolmuş) kullanıcı
+  // landing'de kalır -- normal "giriş yapılmamış" durumu.
+  useEffect(() => {
+    authApi
+      .refresh()
+      .then((res) => {
+        saveAccessToken(res.access_token);
+        return authApi.me(res.access_token);
+      })
+      .then((res) => {
+        handleLogin(ROLE_MAP[res.user.role]);
+      })
+      .catch(() => {
+        clearTokens();
+      });
+  }, []);
+
+  // --- SİSTEM SAĞLIĞI (H2) -- DB/AI/Redis erişilemezse backend /health/ready 503 döner,
+  // 500 değil (docs/04) -- istemci bunu "sistem geçici bakımda" banner'ı olarak gösterir.
+  useEffect(() => {
+    const check = () => healthApi.ready().then((res) => setSystemDown(!res.ok));
+    check();
+    const interval = setInterval(check, 60_000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // --- CANLI BİLDİRİMLER (WS /v1/notifications/stream, Socket.IO) ---
+  useEffect(() => {
+    if (userRole === "none") {
+      disconnectNotificationsSocket();
+      return;
+    }
+    const token = getAccessToken();
+    if (!token) return;
+
+    connectNotificationsSocket(
+      token,
+      (n) => setNotifications((prev) => (prev.some((existing) => existing.id === n.id) ? prev : [mapSocketNotification(n), ...prev])),
+      () => {} // rozet sayısı yerel listeden (unreadCount = notifications.filter(!read)) türetiliyor, ayrı bir state tutmuyoruz
+    );
+
+    return () => disconnectNotificationsSocket();
+  }, [userRole]);
+
+  // --- VERİ YÜKLEME (giriş yapıldıktan sonra, /auth/me oturum geri yüklemesiyle aynı mantıkla) ---
+  useEffect(() => {
+    if (userRole === "none") return;
+    const token = getAccessToken();
+    if (!token) return;
+
+    facilitiesApi.getMe(token).then(setFacility).catch(() => {});
+    facilitiesApi
+      .listDocuments(token)
+      .then((res) => setFacilityDocuments(res.documents))
+      .catch(() => {});
+
+    materialsApi
+      .listOutputs(token)
+      .then((res) => setOutputs(res.data.map(mapOutput)))
+      .catch(() => {});
+
+    materialsApi
+      .listInputs(token)
+      .then((res) => setInputs(res.data.map(mapInput)))
+      .catch(() => {});
+
+    matchesApi
+      .list(token)
+      .then((res) => {
+        const mapped = res.data.map(mapMatch);
+        setMatches(mapped);
+        setSelectedMatchId((prev) => prev || mapped[0]?.id || "");
+      })
+      .catch(() => {});
+
+    notificationsApi
+      .list(token)
+      .then((res) => setNotifications(res.data.map(mapNotification)))
+      .catch(() => {});
+
+    if (userRole === "admin" || userRole === "osb") {
+      adminApi
+        .listVerifications(token)
+        .then((res) => setOsbVerificationList(res.map(mapVerification)))
+        .catch(() => {}); // OSB_MANAGER oturumlarında beklenen 403, yukarıdaki nota bakınız
+    }
+
+    if (userRole === "osb") {
+      osbDashboardApi.stats(token).then(setOsbStats).catch(() => {});
+      osbDashboardApi
+        .facilities(token)
+        .then((res) => setOsbFacilities(res.data))
+        .catch(() => {});
+      osbDashboardApi.map(token).then(setOsbMap).catch(() => {});
+    }
+
+    if (userRole === "admin") {
+      adminApi
+        .listUsers(token)
+        .then((res) => setPlatformUsers(res.data.map(mapUser)))
+        .catch(() => {});
+
+      reviewQueueApi
+        .list(token)
+        .then((res) => setReviewQueue(res.data.map(mapReviewQueueRow)))
+        .catch(() => {});
+
+      adminApi
+        .listApiKeys(token)
+        .then((res) => setApiKeys(res.data))
+        .catch(() => {});
+
+      adminApi
+        .listWeights(token)
+        .then((rows) => {
+          const active = rows.find((r) => r.active) ?? rows[0];
+          if (!active) return;
+          setWeights({
+            material: Math.round(active.material * 100),
+            quality: Math.round(active.quality * 100),
+            environmental: Math.round(active.environmental * 100),
+            logistics: Math.round(active.logistics * 100),
+            economic: Math.round(active.economic * 100),
+          });
+        })
+        .catch(() => {});
+    }
+  }, [userRole]);
+
+  // --- LOGOUT ---
   const handleLogout = () => {
+    const token = getAccessToken();
+    if (token) {
+      authApi.logout(token).catch(() => {});
+    }
+    clearTokens();
     setUserRole("none");
     setCurrentPage("landing");
+    setOutputs([]);
+    setInputs([]);
+    setMatches([]);
+    setNotifications([]);
+    setPlatformUsers([]);
+    setReviewQueue([]);
+    setOsbVerificationList([]);
+    setOsbStats(null);
+    setOsbFacilities([]);
+    setOsbMap(null);
+    setApiKeys([]);
+    setFacility(null);
+    setFacilityDocuments([]);
   };
 
-  // --- NOTIFICATION HANDLERS ---
+  // --- TESİS DOĞRULAMA BELGESİ YÜKLEME (docs/04 Facilities) ---
+  const handleUploadFacilityDocument = async (file: File, documentType: "tax_certificate" | "operating_permit") => {
+    const token = getAccessToken();
+    if (!token) return;
+    try {
+      await facilitiesApi.uploadDocument(token, file, documentType);
+      const res = await facilitiesApi.listDocuments(token);
+      setFacilityDocuments(res.documents);
+      alert("Belge yüklendi, inceleme bekleniyor.");
+    } catch (err) {
+      alert(err instanceof ApiError ? err.message : "Belge yüklenemedi. Lütfen tekrar deneyin.");
+    }
+  };
+
+  // --- BİLDİRİM İŞLEYİCİLERİ ---
+  // Yalnızca yerel, iyimser (optimistic) UI geri bildirimi -- backend, eşleşme kabul/red
+  // veya tesis doğrulama olayları için kalıcı bir Notification satırı OLUŞTURMUYOR (ne
+  // matches.service.ts ne de admin.service.ts bu olaylarda NotificationsService.create'i
+  // çağırıyor), yani bu hiçbir zaman sunucuya gitmiyor. Sadece anlık, oturum içi bir
+  // geri bildirim sağlıyor.
   const pushNotification = (notification: Omit<AppNotification, "id" | "read" | "createdAt">) => {
     setNotifications((prev) => [
-      { ...notification, id: `n-${prev.length + 1}-${Date.now()}`, read: false, createdAt: nowStamp() },
+      { ...notification, id: `local-${prev.length + 1}-${Date.now()}`, read: false, createdAt: nowStamp() },
       ...prev,
     ]);
   };
 
   const handleMarkNotificationRead = (id: string) => {
     setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));
+    if (id.startsWith("local-")) return;
+    const token = getAccessToken();
+    if (token) notificationsApi.markRead(token, id).catch(() => {});
   };
 
   const handleMarkAllNotificationsRead = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    const token = getAccessToken();
+    if (token) notificationsApi.markAllRead(token).catch(() => {});
   };
 
   // --- FORM HANDLERS ---
-  const handleAddOutputSubmit = (
+  const handleAddOutputSubmit = async (
     name: string,
     classVal: string,
     comp: string,
     qty: number,
     stock: number
   ) => {
-    const newId = `out-${outputs.length + 1}`;
-    const newDppId = `DPP-US-${Math.floor(1000 + Math.random() * 9000)}-${Math.floor(
-      10 + Math.random() * 90
-    )}`;
-    const today = new Date().toISOString().split("T")[0];
+    const token = getAccessToken();
+    if (!token) return;
+    try {
+      const res = await materialsApi.createOutput(token, {
+        description: name,
+        materialClass: classVal.toLowerCase(),
+        composition: parseComposition(comp),
+        quantityKg: qty,
+        stock,
+      });
 
-    const newItem: OutputItem = {
-      id: newId,
-      name,
-      class: classVal,
-      composition: comp,
-      quantity: qty,
-      stock,
-      date: today,
-      dppId: newDppId,
-    };
+      const newItem: OutputItem = {
+        id: res.outputId,
+        name,
+        class: classVal,
+        composition: comp,
+        quantity: qty,
+        stock,
+        date: new Date().toISOString().split("T")[0],
+        dppId: res.passportId,
+        qrCode: res.qrCode,
+        pdfUrl: res.pdfUrl,
+      };
 
-    setOutputs([...outputs, newItem]);
-    setShowOutputModal(false);
+      setOutputs((prev) => [newItem, ...prev]);
+      setShowOutputModal(false);
+    } catch (err) {
+      alert(err instanceof ApiError ? err.message : "Çıktı kaydedilemedi. Lütfen tekrar deneyin.");
+    }
   };
 
-  const handleAddInputSubmit = (
+  const handleAddInputSubmit = async (
     name: string,
     classVal: string,
     freq: string,
     qty: number,
     specs: string
   ) => {
-    const newId = `in-${inputs.length + 1}`;
-    const today = new Date().toISOString().split("T")[0];
+    const token = getAccessToken();
+    if (!token) return;
+    try {
+      const res = await materialsApi.createInput(token, {
+        description: name,
+        materialClass: classVal.toLowerCase(),
+        specs: { raw: specs },
+        quantityKg: qty,
+        frequency: freq,
+      });
 
-    const itemToAdd: InputItem = {
-      id: newId,
-      name: name,
-      class: classVal,
-      frequency: freq,
-      quantity: qty,
-      specs: specs,
-      date: today,
-    };
+      const itemToAdd: InputItem = {
+        id: res.inputId,
+        name,
+        class: classVal,
+        frequency: freq,
+        quantity: qty,
+        specs,
+        date: new Date().toISOString().split("T")[0],
+      };
 
-    setInputs([...inputs, itemToAdd]);
-    setShowInputModal(false);
+      setInputs((prev) => [itemToAdd, ...prev]);
+      setShowInputModal(false);
+    } catch (err) {
+      alert(err instanceof ApiError ? err.message : "Girdi kaydedilemedi. Lütfen tekrar deneyin.");
+    }
   };
 
   // --- MATCHMAKER ACTIONS ---
-  const handleAcceptMatch = () => {
+  const handleAcceptMatch = async () => {
+    const token = getAccessToken();
+    if (!token || !selectedMatchId) return;
     const match = matches.find((m) => m.id === selectedMatchId);
-    setMatches(
-      matches.map((m) => (m.id === selectedMatchId ? { ...m, status: "accepted" } : m))
-    );
-    setShowSuccessModal(true);
-    if (match) {
-      pushNotification({
-        type: "match_accepted",
-        title: "Eşleşme kabul edildi",
-        body: `${match.name} ile olan eşleştirme kabul edildi, iletişim bilgileri paylaşıldı.`,
-      });
+    try {
+      const res = await matchesApi.accept(token, selectedMatchId);
+      setMatches((prev) => prev.map((m) => (m.id === selectedMatchId ? { ...m, status: res.status } : m)));
+      setShowSuccessModal(true);
+      if (match) {
+        pushNotification({
+          type: "match_accepted",
+          title: "Eşleşme kabul edildi",
+          body: `${match.name} ile olan eşleştirme kabul edildi.`,
+        });
+      }
+    } catch (err) {
+      alert(err instanceof ApiError ? err.message : "Eşleşme kabul edilemedi. Lütfen tekrar deneyin.");
     }
   };
 
-  const handleVerifyOsbFacility = (id: string) => {
+  const handleRejectMatch = async (reasonCategory: string, reasonText: string) => {
+    const token = getAccessToken();
+    if (!token || !selectedMatchId) return;
+    try {
+      await matchesApi.reject(token, selectedMatchId, { reasonCategory, reasonText: reasonText || undefined });
+      setMatches((prev) => prev.map((m) => (m.id === selectedMatchId ? { ...m, status: "rejected" } : m)));
+    } catch (err) {
+      alert(err instanceof ApiError ? err.message : "Eşleşme reddedilemedi. Lütfen tekrar deneyin.");
+    }
+  };
+
+  const handleVerifyOsbFacility = async (id: string) => {
+    const token = getAccessToken();
+    if (!token) return;
     const facility = osbVerificationList.find((v) => v.id === id);
-    setOsbVerificationList(
-      osbVerificationList.map((v) => (v.id === id ? { ...v, status: "approved" } : v))
-    );
-    if (facility) {
-      pushNotification({
-        type: "facility_verified",
-        title: "Tesis doğrulandı",
-        body: `${facility.name} tesisi başarıyla doğrulandı ve OSB genel haritasına dahil edildi.`,
-      });
+    try {
+      await adminApi.approveVerification(token, id);
+      setOsbVerificationList((prev) => prev.map((v) => (v.id === id ? { ...v, status: "approved" } : v)));
+      if (facility) {
+        pushNotification({
+          type: "facility_verified",
+          title: "Tesis doğrulandı",
+          body: `${facility.name} tesisi başarıyla doğrulandı.`,
+        });
+      }
+    } catch (err) {
+      // OSB_MANAGER oturumları için beklenen durum: bu endpoint backend'de yalnızca ADMIN'e
+      // açık (admin.controller.ts @Roles(ADMIN)) -- OSB'ye özel bir doğrulama rotası yok.
+      alert(err instanceof ApiError ? err.message : "Tesis doğrulanamadı. Lütfen tekrar deneyin.");
     }
   };
 
-  // --- ADMIN ACTIONS ---
-  const handleRemoveUser = (id: string) => {
-    setPlatformUsers((prev) => prev.filter((u) => u.id !== id));
+  const handleCreateApiKey = async (name: string, userId: string): Promise<string | null> => {
+    const token = getAccessToken();
+    if (!token) return null;
+    try {
+      const res = await adminApi.createApiKey(token, { name, userId });
+      const refreshed = await adminApi.listApiKeys(token);
+      setApiKeys(refreshed.data);
+      return res.key;
+    } catch (err) {
+      alert(err instanceof ApiError ? err.message : "API anahtarı üretilemedi. Lütfen tekrar deneyin.");
+      return null;
+    }
   };
 
-  const handleApproveReview = (id: string) => {
-    setReviewQueue((prev) => prev.map((r) => (r.id === id ? { ...r, status: "approved" } : r)));
+  const handleRevokeApiKey = async (id: string) => {
+    const token = getAccessToken();
+    if (!token) return;
+    try {
+      await adminApi.revokeApiKey(token, id);
+      setApiKeys((prev) => prev.map((k) => (k.id === id ? { ...k, revokedAt: new Date().toISOString() } : k)));
+    } catch (err) {
+      alert(err instanceof ApiError ? err.message : "API anahtarı iptal edilemedi. Lütfen tekrar deneyin.");
+    }
+  };
+
+  const handleDownloadOsbMonthlyReport = (period: string, format: "pdf" | "xlsx"): void => {
+    const token = getAccessToken();
+    if (!token) return;
+    osbDashboardApi
+      .downloadMonthlyReport(token, period, format)
+      .catch((err) => alert(err instanceof ApiError ? err.message : "Rapor indirilemedi. Lütfen tekrar deneyin."));
+  };
+
+  // --- ADMİN İŞLEMLERİ ---
+  const handleRemoveUser = () => {
+    // Backend yalnızca POST /admin/users ve PATCH /admin/users/:id'yi uyguluyor --
+    // admin.controller.ts içinde hiçbir DELETE endpoint'i yok, yani kullanıcı "silme"
+    // işleminin çağıracağı gerçek bir şey yok. Sahte bir silme davranışı yerine dürüstçe
+    // gösteriliyor -- AuthModal'ın "şifremi unuttum" için kullandığı aynı yaklaşım
+    // (o da backend'de henüz uygulanmamıştı).
+    alert("Kullanıcı silme işlevi backend'de henüz desteklenmiyor (DELETE /admin/users/:id mevcut değil).");
+  };
+
+  const handleApproveReview = async (id: string) => {
+    const token = getAccessToken();
+    if (!token) return;
     const item = reviewQueue.find((r) => r.id === id);
-    if (item) {
-      pushNotification({
-        type: "match_accepted",
-        title: "Uzman onayı tamamlandı",
-        body: `${item.matchName} eşleşmesi uzman incelemesinden onaylandı.`,
-      });
+    try {
+      // ApproveReviewDto bir materialClass gerektiriyor, ancak AdminView'in review-queue
+      // arayüzü yalnızca Onayla/Reddet butonları sunuyor (sınıf seçici yok) -- bu yüzden
+      // detay endpoint'inden çekilen AI'ın kendi en iyi önerisi onaylanan sınıf olarak
+      // kullanılıyor, yani "uzman AI'ın en iyi tahminini kabul ediyor". Gerçek bir sınıf
+      // değiştirme arayüzü bu kapsamın dışında.
+      const detail = await reviewQueueApi.detail(token, id);
+      const top1 = detail.aiSuggestion?.[0]?.[0];
+      if (!top1) {
+        alert("AI önerisi bulunamadı, bu kayıt otomatik onaylanamıyor.");
+        return;
+      }
+      await reviewQueueApi.approve(token, id, { materialClass: top1 });
+      setReviewQueue((prev) => prev.map((r) => (r.id === id ? { ...r, status: "approved" } : r)));
+      if (item) {
+        pushNotification({
+          type: "match_accepted",
+          title: "Uzman onayı tamamlandı",
+          body: `${item.matchName} kaydı "${top1}" olarak onaylandı.`,
+        });
+      }
+    } catch (err) {
+      alert(err instanceof ApiError ? err.message : "Onaylanamadı. Lütfen tekrar deneyin.");
     }
   };
 
-  const handleRejectReview = (id: string) => {
-    setReviewQueue((prev) => prev.map((r) => (r.id === id ? { ...r, status: "rejected" } : r)));
+  const handleRejectReview = async (id: string) => {
+    const token = getAccessToken();
+    if (!token) return;
+    try {
+      await reviewQueueApi.reject(token, id, { notes: "Uzman tarafından reddedildi." });
+      setReviewQueue((prev) => prev.map((r) => (r.id === id ? { ...r, status: "rejected" } : r)));
+    } catch (err) {
+      alert(err instanceof ApiError ? err.message : "Reddedilemedi. Lütfen tekrar deneyin.");
+    }
   };
 
-  const handleSaveWeights = (newWeights: WeightsConfig) => {
-    setWeights(newWeights);
+  const handleSaveWeights = async (newWeights: WeightsConfig) => {
+    const token = getAccessToken();
+    if (!token) return;
+    try {
+      // Frontend yüzde (0-100) tutuyor, backend kesir (0-1) + toplam tam 1.000 istiyor.
+      // Yeni versiyon otomatik aktifleşmiyor (docs/04) -- create + activate iki ayrı çağrı.
+      const created = await adminApi.createWeights(token, {
+        material: newWeights.material / 100,
+        quality: newWeights.quality / 100,
+        environmental: newWeights.environmental / 100,
+        logistics: newWeights.logistics / 100,
+        economic: newWeights.economic / 100,
+      });
+      await adminApi.activateWeights(token, created.id);
+      setWeights(newWeights);
+    } catch (err) {
+      alert(err instanceof ApiError ? err.message : "Ağırlıklar kaydedilemedi. Lütfen tekrar deneyin.");
+    }
   };
 
   // --- CHATBOT ACTIONS (paylaşılan: tam sayfa + köşe widget) ---
+  // ÖNEMLİ: backend'in `ai` modülü tam olarak tek bir endpoint sunuyor -- POST /ai/classify,
+  // dar kapsamlı, tek seferlik bir malzeme sınıflandırıcısı (materialClass/confidence/top3).
+  // Backend'de genel bir sohbet/konuşma endpoint'i yok. Bunu gerçek bir backend entegrasyonu
+  // gibi göstermek yerine, handleChatSend hep olduğu gibi kalıyor: anahtar kelime eşleştirmeli,
+  // hazır cevaplı yerel bir sezgisel yapı. Backend'i ÇAĞIRMIYOR.
   const handleChatSend = (userMsg: string) => {
     setChatMessages((prev) => [...prev, { role: "user", content: userMsg }]);
     setChatIsTyping(true);
@@ -352,7 +723,7 @@ export default function Home() {
     }, 1500);
   };
 
-  const selectedMatch = matches.find((m) => m.id === selectedMatchId) || matches[0];
+  const selectedMatch = matches.find((m) => m.id === selectedMatchId) || matches[0] || null;
 
   return (
     <div className="flex-grow w-full flex flex-col relative select-none">
@@ -362,6 +733,11 @@ export default function Home() {
       {/* ================= 2. AUTHENTICATED SYSTEM CONTAINER ================= */}
       {currentPage !== "landing" && (
         <div className="w-full min-h-screen flex relative overflow-x-hidden">
+          {systemDown && (
+            <div className="fixed top-0 inset-x-0 z-[60] bg-rose-600 text-white text-center text-xs font-semibold py-2 px-4">
+              Sistem geçici olarak bakımda — bazı işlemler şu anda çalışmayabilir. Lütfen birazdan tekrar deneyin.
+            </div>
+          )}
           {/* Mobile Sidebar Backdrop Overlay */}
           {sidebarOpen && (
             <div
@@ -399,6 +775,9 @@ export default function Home() {
                   outputsCount={outputs.length}
                   inputsCount={inputs.length}
                   outputs={outputs}
+                  facility={facility}
+                  facilityDocuments={facilityDocuments}
+                  onUploadDocument={handleUploadFacilityDocument}
                 />
               )}
 
@@ -424,6 +803,7 @@ export default function Home() {
                   selectedMatchId={selectedMatchId}
                   setSelectedMatchId={setSelectedMatchId}
                   onAcceptMatch={handleAcceptMatch}
+                  onRejectMatch={handleRejectMatch}
                 />
               )}
 
@@ -437,6 +817,10 @@ export default function Home() {
                 <OsbView
                   osbVerificationList={osbVerificationList}
                   onVerifyFacility={handleVerifyOsbFacility}
+                  stats={osbStats}
+                  facilities={osbFacilities}
+                  map={osbMap}
+                  onDownloadMonthlyReport={handleDownloadOsbMonthlyReport}
                 />
               )}
 
@@ -449,6 +833,9 @@ export default function Home() {
                   onRejectReview={handleRejectReview}
                   weights={weights}
                   onSaveWeights={handleSaveWeights}
+                  apiKeys={apiKeys}
+                  onCreateApiKey={handleCreateApiKey}
+                  onRevokeApiKey={handleRevokeApiKey}
                 />
               )}
             </main>

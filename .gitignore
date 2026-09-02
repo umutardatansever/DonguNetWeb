@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# eco-match-application-main: reference backend + docs living alongside this
+# frontend for now (endpoint contract source of truth) -- not part of this repo.
+/eco-match-application-main/

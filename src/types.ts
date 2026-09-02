@@ -1,3 +1,8 @@
+// Frontend view model'leri. Alanlar, gerçek backend'in döndürdüğü verinin
+// (bkz. src/lib/api.ts satır tipleri) mevcut bileşenlerin render ettiği şekle
+// çevrilmiş halidir; backend'in hiç döndürmediği alanlar (tip başına notlara
+// bakınız) sahte veri yerine nullable/optional olarak tiplenmiştir.
+
 export interface OutputItem {
   id: string;
   name: string;
@@ -6,7 +11,12 @@ export interface OutputItem {
   stock: number;
   composition: string;
   date: string;
-  dppId: string;
+  // GET /materials/outputs ilişkili MaterialPassport satırını içermez, bu yüzden bu
+  // yalnızca mevcut oturumda oluşturulan çıktılar için bilinir (createOutput'un
+  // yanıtından). list ile çekilen geçmiş kayıtlarda dppId/qrCode/pdfUrl === null olur.
+  dppId: string | null;
+  qrCode: string | null;
+  pdfUrl: string | null;
 }
 
 export interface InputItem {
@@ -23,12 +33,14 @@ export interface MatchCandidate {
   id: string;
   name: string;
   score: number;
-  distance: number;
+  // GET /matches veya GET /matches/:id'de bulunmuyor (yalnızca aday üretim
+  // endpoint'i GET /matches/find/:outputId, burada kullanılan "eşleşmelerim"
+  // anlamında bir Match oluşmadan önce distanceKm döndürüyor) -- bilinmediğinde null.
+  distanceKm: number | null;
   co2: number;
-  savings: number;
-  status: "pending" | "accepted" | "rejected" | "completed";
+  savings: number; // CBAM karbon vergisi tasarrufu (EUR) -- matches.cbamImpact
+  status: "pending" | "accepted" | "completed" | "rejected" | "expired";
   date: string;
-  confidence: number;
   details: {
     material: number;
     quality: number;
@@ -47,12 +59,15 @@ export interface OSBVerification {
   id: string;
   name: string;
   sector: string;
-  status: "pending" | "approved";
+  status: "pending" | "approved" | "rejected";
 }
 
 export interface AppNotification {
+  // Backend bildirim "type" alanı, çağrı yerine göre serbest metin bir string
+  // (örn. "review_required", "classification_approved", "classification_rejected",
+  // "match_expired") -- mock arayüzün varsaydığı sabit 4 değerli union değil.
   id: string;
-  type: "match_accepted" | "match_rejected" | "review_required" | "facility_verified";
+  type: string;
   title: string;
   body: string;
   read: boolean;
@@ -63,7 +78,10 @@ export interface PlatformUser {
   id: string;
   name: string;
   email: string;
-  role: "user" | "admin" | "osb_manager";
+  // Gerçek UserRole enum'u: USER | FACILITY_ADMIN | EXPERT | OSB_MANAGER | ADMIN
+  role: string;
+  // GET /admin/users yalnızca facilityId (bir uuid) döndürür, tesis adı değil --
+  // çözümleyecek bir facility ilişkisi dahil edilmediğinden olduğu gibi gösterilir.
   facility: string;
 }
 

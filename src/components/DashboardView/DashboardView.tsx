@@ -1,18 +1,36 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "./DashboardView.module.css";
 import { OutputItem } from "../../types";
+import { FacilityMe, FacilityDocumentRow } from "../../lib/api";
 
 interface DashboardViewProps {
   outputsCount: number;
   inputsCount: number;
   outputs: OutputItem[];
+  facility: FacilityMe | null;
+  facilityDocuments: FacilityDocumentRow[];
+  onUploadDocument: (file: File, documentType: "tax_certificate" | "operating_permit") => void;
 }
 
-export default function DashboardView({ outputsCount, inputsCount, outputs }: DashboardViewProps) {
+const DOCUMENT_TYPE_LABEL: Record<string, string> = {
+  tax_certificate: "Vergi Levhası",
+  operating_permit: "Faaliyet İzni",
+};
+
+export default function DashboardView({
+  outputsCount,
+  inputsCount,
+  outputs,
+  facility,
+  facilityDocuments,
+  onUploadDocument,
+}: DashboardViewProps) {
   const sensorCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const forecastCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [uploadType, setUploadType] = useState<"tax_certificate" | "operating_permit">("tax_certificate");
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // --- DRAWING IoT SENSOR LINE CHART ---
   const drawDashboardSensorChart = () => {
@@ -204,6 +222,69 @@ export default function DashboardView({ outputsCount, inputsCount, outputs }: Da
 
   return (
     <div className={styles.container}>
+      {/* Tesis doğrulama durumu (docs/04 Facilities) -- verified=false ise materials POST
+          403 FACILITY_NOT_VERIFIED alır, bu yüzden burada belge yükleme akışı sağlanıyor. */}
+      {facility && !facility.verified && (
+        <div className="glass-panel p-5 rounded-2xl border border-amber-500/30 bg-amber-500/5 flex flex-col gap-3">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-amber-700">pending_actions</span>
+            <h3 className="font-title font-bold text-on-surface text-sm">Tesisiniz henüz doğrulanmadı</h3>
+          </div>
+          <p className="text-xs text-on-surface-variant">
+            Doğrulanana kadar çıktı/girdi kaydı oluşturamazsınız. Vergi levhası veya faaliyet izni belgesi yükleyin,
+            admin incelemesi sonrası tesisiniz aktifleşir.
+          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <select
+              value={uploadType}
+              onChange={(e) => setUploadType(e.target.value as typeof uploadType)}
+              className="bg-surface border border-border-color rounded-xl px-3 py-2 text-xs text-on-surface"
+            >
+              <option value="tax_certificate">Vergi Levhası</option>
+              <option value="operating_permit">Faaliyet İzni</option>
+            </select>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".pdf,.jpg,.jpeg"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) onUploadDocument(file, uploadType);
+                e.target.value = "";
+              }}
+              className="hidden"
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="btn-primary px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-[16px]">upload_file</span>
+              Belge Yükle (PDF/JPG, max 10 MB)
+            </button>
+          </div>
+          {facilityDocuments.length > 0 && (
+            <div className="flex flex-col gap-1.5 mt-1">
+              {facilityDocuments.map((d) => (
+                <div key={d.id} className="flex items-center justify-between text-[11px] bg-surface-light/60 rounded-lg px-3 py-2">
+                  <span className="text-on-surface-variant">{DOCUMENT_TYPE_LABEL[d.documentType] ?? d.documentType}</span>
+                  <span
+                    className={`px-2 py-0.5 rounded font-bold uppercase ${
+                      d.status === "APPROVED"
+                        ? "text-accent-mint"
+                        : d.status === "REJECTED"
+                        ? "text-rose-600"
+                        : "text-amber-700"
+                    }`}
+                  >
+                    {d.status === "APPROVED" ? "Onaylandı" : d.status === "REJECTED" ? "Reddedildi" : "İnceleniyor"}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Bento Stats */}
       <div className={styles.statsGrid}>
         <div className="glass-panel p-4 md:p-6 rounded-2xl flex flex-col justify-between">
