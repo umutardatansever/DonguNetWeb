@@ -9,7 +9,6 @@ import {
   reviewQueueApi,
   notificationsApi,
   osbDashboardApi,
-  healthApi,
   facilitiesApi,
   ApiError,
   OutputRow,
@@ -218,7 +217,6 @@ export default function Home() {
   const [osbMap, setOsbMap] = useState<OsbMapResponse | null>(null);
 
   // --- SİSTEM SAĞLIĞI (H2) -- /health/ready periyodik kontrol, DB/AI/Redis erişilemezse banner ---
-  const [systemDown, setSystemDown] = useState(false);
 
   // --- NOTIFICATIONS STATE ---
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
@@ -375,15 +373,6 @@ export default function Home() {
       .catch(() => {
         clearTokens();
       });
-  }, []);
-
-  // --- SİSTEM SAĞLIĞI (H2) -- DB/AI/Redis erişilemezse backend /health/ready 503 döner,
-  // 500 değil (docs/04) -- istemci bunu "sistem geçici bakımda" banner'ı olarak gösterir.
-  useEffect(() => {
-    const check = () => healthApi.ready().then((res) => setSystemDown(!res.ok));
-    check();
-    const interval = setInterval(check, 60_000);
-    return () => clearInterval(interval);
   }, []);
 
   // --- CANLI BİLDİRİMLER (WS /v1/notifications/stream, Socket.IO) ---
@@ -830,11 +819,6 @@ export default function Home() {
       {/* ================= 2. AUTHENTICATED SYSTEM CONTAINER ================= */}
       {currentPage !== "landing" && (
         <div className="w-full min-h-screen flex relative overflow-x-hidden">
-          {systemDown && (
-            <div className="fixed top-0 inset-x-0 z-[60] bg-rose-600 text-white text-center text-xs font-semibold py-2 px-4">
-              Sistem geçici olarak bakımda — bazı işlemler şu anda çalışmayabilir. Lütfen birazdan tekrar deneyin.
-            </div>
-          )}
           {/* Mobile Sidebar Backdrop Overlay */}
           {sidebarOpen && (
             <div
