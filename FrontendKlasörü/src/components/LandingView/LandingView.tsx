@@ -6,9 +6,10 @@ import AuthModal from "../Modals/AuthModal";
 
 interface LandingViewProps {
   onLogin: (role: "user" | "osb" | "admin") => void;
+  onDemoLogin: (role: "user" | "osb" | "admin") => void;
 }
 
-export default function LandingView({ onLogin }: LandingViewProps) {
+export default function LandingView({ onLogin, onDemoLogin }: LandingViewProps) {
   const [authRole, setAuthRole] = useState<"user" | "osb" | "admin" | null>(null);
 
   return (
@@ -25,6 +26,12 @@ export default function LandingView({ onLogin }: LandingViewProps) {
           <a className="text-on-surface-variant hover:text-accent-mint transition-colors duration-200 text-sm font-medium hidden md:block" href="#capabilities">
             Yetenekler
           </a>
+          <button
+            onClick={() => onDemoLogin("user")}
+            className="text-accent-mint hover:underline text-sm font-medium cursor-pointer"
+          >
+            Demoyu Görüntüle
+          </button>
           <button onClick={() => setAuthRole("user")} className="btn-secondary px-6 py-2.5 rounded-full text-sm font-medium cursor-pointer">
             Giriş Yap
           </button>
@@ -93,7 +100,18 @@ export default function LandingView({ onLogin }: LandingViewProps) {
                     <p className="text-xs text-on-surface-variant mt-0.5">Atık listeleme, girdi arama ve eşleştirme</p>
                   </div>
                 </div>
-                <span className={`material-symbols-outlined text-on-surface-variant group-hover:text-accent-mint ${styles.chevronIcon}`}>chevron_right</span>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDemoLogin("user");
+                    }}
+                    className="text-[10px] font-bold uppercase tracking-wider text-accent-mint hover:underline cursor-pointer"
+                  >
+                    Demo
+                  </button>
+                  <span className={`material-symbols-outlined text-on-surface-variant group-hover:text-accent-mint ${styles.chevronIcon}`}>chevron_right</span>
+                </div>
               </div>
 
               <div onClick={() => setAuthRole("osb")} className={`${styles.card} glass-panel p-6 rounded-2xl flex items-center justify-between group cursor-pointer transition-all duration-300`}>
@@ -106,7 +124,18 @@ export default function LandingView({ onLogin }: LandingViewProps) {
                     <p className="text-xs text-on-surface-variant mt-0.5">Bölgesel döngüsellik ve toplu analiz takibi</p>
                   </div>
                 </div>
-                <span className={`material-symbols-outlined text-on-surface-variant group-hover:text-teal-700 ${styles.chevronIcon}`}>chevron_right</span>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDemoLogin("osb");
+                    }}
+                    className="text-[10px] font-bold uppercase tracking-wider text-teal-700 hover:underline cursor-pointer"
+                  >
+                    Demo
+                  </button>
+                  <span className={`material-symbols-outlined text-on-surface-variant group-hover:text-teal-700 ${styles.chevronIcon}`}>chevron_right</span>
+                </div>
               </div>
 
               <div onClick={() => setAuthRole("admin")} className={`${styles.card} glass-panel p-6 rounded-2xl flex items-center justify-between group cursor-pointer transition-all duration-300`}>
@@ -119,7 +148,18 @@ export default function LandingView({ onLogin }: LandingViewProps) {
                     <p className="text-xs text-on-surface-variant mt-0.5">Kullanıcı, onay kuyruğu ve ağırlık yönetimi</p>
                   </div>
                 </div>
-                <span className={`material-symbols-outlined text-on-surface-variant group-hover:text-secondary ${styles.chevronIcon}`}>chevron_right</span>
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDemoLogin("admin");
+                    }}
+                    className="text-[10px] font-bold uppercase tracking-wider text-secondary hover:underline cursor-pointer"
+                  >
+                    Demo
+                  </button>
+                  <span className={`material-symbols-outlined text-on-surface-variant group-hover:text-secondary ${styles.chevronIcon}`}>chevron_right</span>
+                </div>
               </div>
             </div>
           </div>

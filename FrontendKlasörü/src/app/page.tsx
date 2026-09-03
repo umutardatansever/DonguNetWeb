@@ -258,6 +258,103 @@ export default function Home() {
     }
   };
 
+  // --- DEMO GİRİŞİ (backend'e bağlı DEĞİL) ---
+  // Canlı GitHub Pages sitesi hiçbir backend'e ulaşamıyor (NEXT_PUBLIC_API_URL
+  // build zamanında localhost'a gömülü) -- ziyaretçilerin arayüzü görebilmesi
+  // için gerçek girişi atlayıp örnek veriyle dolduruyoruz. handleLogin ile aynı
+  // rol yönlendirmesini yapar ama access token yok, bu yüzden veri yükleme
+  // useEffect'i (token olmadan erken return eder) bu veriyi ezmez.
+  const handleDemoLogin = (role: "user" | "osb" | "admin") => {
+    setOutputs([
+      {
+        id: "demo-out-1",
+        name: "Tekstil boyahanesi çıkışı arıtma çamuru",
+        class: "ORGANIC",
+        quantity: 800,
+        stock: 620,
+        composition: "selüloz %60, su %30, diğer %10",
+        date: "2026-08-20",
+        dppId: "demo-dpp-1",
+        qrCode: null,
+        pdfUrl: null,
+      },
+      {
+        id: "demo-out-2",
+        name: "Alüminyum talaş ve döküm artığı",
+        class: "METAL",
+        quantity: 1450,
+        stock: 1450,
+        composition: "Al %94, Fe %3, diğer %3",
+        date: "2026-08-24",
+        dppId: "demo-dpp-2",
+        qrCode: null,
+        pdfUrl: null,
+      },
+    ]);
+    setInputs([
+      {
+        id: "demo-in-1",
+        name: "İkincil PET granül ihtiyacı",
+        class: "PLASTIC",
+        quantity: 2000,
+        frequency: "monthly",
+        specs: "Saflık > %90",
+        date: "2026-08-18",
+      },
+    ]);
+    setMatches([
+      {
+        id: "demo-match-1",
+        name: "Ankara OSB — yapı malzemeleri fabrikası",
+        score: 78,
+        distanceKm: 12.4,
+        co2: 24000,
+        savings: 2917,
+        status: "pending",
+        date: "2026-08-25",
+        details: { material: 85, quality: 72, env: 90, logistics: 68, economic: 65 },
+      },
+      {
+        id: "demo-match-2",
+        name: "Kocaeli OSB — metal geri kazanım tesisi",
+        score: 91,
+        distanceKm: 34.1,
+        co2: 41000,
+        savings: 5100,
+        status: "completed",
+        date: "2026-08-10",
+        details: { material: 92, quality: 88, env: 94, logistics: 85, economic: 90 },
+      },
+    ]);
+    setSelectedMatchId("demo-match-1");
+    setNotifications([
+      {
+        id: "demo-notif-1",
+        type: "match_completed",
+        title: "Yeni eşleşme kabul edildi!",
+        body: "Kocaeli OSB metal geri kazanım tesisi eşleşmenizi kabul etti.",
+        read: false,
+        createdAt: nowStamp(),
+      },
+    ]);
+    if (role === "admin") {
+      setPlatformUsers([
+        { id: "demo-u-1", name: "Aylin Yıldız", email: "aylin@dokutekstil.com", role: "FACILITY_ADMIN", facility: "Doku Tekstil A.Ş." },
+        { id: "demo-u-2", name: "Mert Kaya", email: "mert@anadoluosb.com", role: "OSB_MANAGER", facility: "Anadolu OSB" },
+      ]);
+      setReviewQueue([
+        { id: "demo-rq-1", matchName: "PVC atık kaplama artığı", confidence: 0.62, reason: "Sınıflandırma güveni HITL eşiğinin (%80) altında", status: "pending" },
+      ]);
+    }
+    if (role === "osb" || role === "admin") {
+      setOsbVerificationList([
+        { id: "demo-v-1", name: "Trakya Cam Sanayi", sector: "Cam Geri Kazanım", status: "pending" },
+        { id: "demo-v-2", name: "Ege Kimya Üretim", sector: "Kimya", status: "approved" },
+      ]);
+    }
+    handleLogin(role);
+  };
+
   // --- OTURUM GERİ YÜKLEME ---
   // Access token artık yalnızca 1 saat ömürlü ve refresh token httpOnly cookie'de
   // (K-18) -- localStorage'da hiç görünmüyor. Bu yüzden sayfa her açıldığında önce
@@ -728,7 +825,7 @@ export default function Home() {
   return (
     <div className="flex-grow w-full flex flex-col relative select-none">
       {/* ================= 1. PUBLIC LANDING VIEW ================= */}
-      {currentPage === "landing" && <LandingView onLogin={handleLogin} />}
+      {currentPage === "landing" && <LandingView onLogin={handleLogin} onDemoLogin={handleDemoLogin} />}
 
       {/* ================= 2. AUTHENTICATED SYSTEM CONTAINER ================= */}
       {currentPage !== "landing" && (
