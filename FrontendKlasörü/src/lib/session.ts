@@ -4,7 +4,7 @@ import { BackendRole } from "./api";
 // artık httpOnly cookie'de (K-18) -- JS'ten hiç görünmez/erişilmez, bu yüzden
 // burada saklanacak ikinci bir token yok. Süresi dolan access token
 // authApi.refresh() ile (cookie üzerinden, credentials:'include') yenilenir.
-const ACCESS_TOKEN_KEY = "dongunet_access_token";
+const ACCESS_TOKEN_KEY = "ecomatch_access_token";
 
 // EXPERT'in kendi paneli yok (yalnızca admin/review-queue'ya admin ile birlikte
 // erişir) -- en yakın karşılığı olan "admin" paneline düşer.

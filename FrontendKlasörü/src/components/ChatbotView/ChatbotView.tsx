@@ -33,7 +33,7 @@ export default function ChatbotView({ chatMessages, onSend, isTyping }: ChatbotV
           <span className="material-symbols-outlined text-accent-mint">smart_toy</span>
         </div>
         <div>
-          <h3 className="font-title font-bold text-on-surface text-sm">DöngüNet AI Sürdürülebilirlik Asistanı</h3>
+          <h3 className="font-title font-bold text-on-surface text-sm">EcoMatch AI Sürdürülebilirlik Asistanı</h3>
           <p className="text-[10px] text-teal-700 font-medium">Claude API ile Mevzuat Danışmanlığı (Simüle)</p>
         </div>
       </div>

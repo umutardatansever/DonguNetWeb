@@ -33,7 +33,7 @@ export default function Header({
       case "reports":
         return "Raporlama Merkezi";
       case "chatbot":
-        return "DöngüNet AI Asistanı";
+        return "EcoMatch AI Asistanı";
       case "osb":
         return "OSB Yönetici Paneli";
       case "admin":

@@ -396,7 +396,7 @@ export default function MatchmakerView({
             </div>
             <div className="flex flex-col items-end">
               <span className="text-2xl font-black font-title text-accent-mint">{selectedMatch.score} / 100</span>
-              <span className="text-[10px] font-bold text-on-surface-variant">DÖNGÜNET MATCH SCORE</span>
+              <span className="text-[10px] font-bold text-on-surface-variant">ECOMATCH MATCH SCORE</span>
             </div>
           </div>
 

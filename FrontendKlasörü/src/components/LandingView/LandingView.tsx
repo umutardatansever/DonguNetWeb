@@ -18,7 +18,7 @@ export default function LandingView({ onLogin }: LandingViewProps) {
         <div className="flex items-center gap-3">
           <span className="material-symbols-outlined text-accent-mint text-3xl filled">recycling</span>
           <span className="font-title text-2xl font-bold tracking-tight text-on-surface flex items-center gap-1.5">
-            Döngü<span className="text-accent-mint">Net</span>
+            Eco<span className="text-accent-mint">Match</span>
           </span>
         </div>
         <div className="flex items-center gap-6">
@@ -69,7 +69,7 @@ export default function LandingView({ onLogin }: LandingViewProps) {
                 Yapay Zeka Destekli Kaynak Optimizasyonu
               </div>
               <h1 className="font-title text-4xl md:text-5xl lg:text-6xl font-extrabold text-on-surface leading-tight">
-                DöngüNet: Akıllı<br />
+                EcoMatch: Akıllı<br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent-mint">Endüstriyel Simbiyoz</span> Platformu
               </h1>
               <p className="text-base md:text-lg text-on-surface-variant max-w-2xl leading-relaxed">

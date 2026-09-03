@@ -37,7 +37,7 @@ export default function Sidebar({
           <div className="flex items-center gap-3">
             <span className="material-symbols-outlined text-accent-mint text-3xl filled">recycling</span>
             <span className="font-title text-xl font-bold tracking-tight text-on-surface">
-              Döngü<span className="text-accent-mint">Net</span>
+              Eco<span className="text-accent-mint">Match</span>
             </span>
           </div>
           <button
@@ -85,7 +85,7 @@ export default function Sidebar({
                 className={`${styles.link} ${currentPage === "chatbot" ? styles.linkActive : styles.linkInactive}`}
               >
                 <span className="material-symbols-outlined text-[20px]">forum</span>
-                DöngüNet AI Asistanı
+                EcoMatch AI Asistanı
               </button>
             </>
           )}
@@ -118,7 +118,7 @@ export default function Sidebar({
           </div>
           <div className="overflow-hidden">
             <h4 className="text-xs font-bold text-on-surface truncate">
-              {userRole === "osb" ? "Gebze OSB Müdürlüğü" : userRole === "admin" ? "DöngüNet Sistem Admini" : "Gebze Metal A.Ş."}
+              {userRole === "osb" ? "Gebze OSB Müdürlüğü" : userRole === "admin" ? "EcoMatch Sistem Admini" : "Gebze Metal A.Ş."}
             </h4>
             <p className="text-[10px] text-on-surface-variant">
               {userRole === "osb" ? "Bölge Yöneticisi" : userRole === "admin" ? "Sistem Yöneticisi" : "Tesis Temsilcisi"}

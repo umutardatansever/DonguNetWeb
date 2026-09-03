@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DöngüNet - Yapay Zeka Destekli Endüstriyel Simbiyoz Platformu",
+  title: "EcoMatch - Yapay Zeka Destekli Endüstriyel Simbiyoz Platformu",
   description: "Endüstriyel atık ve yan ürünlerin yapay zeka ile eşleştirilmesi ve SKDM (CBAM) raporlanması.",
 };
 

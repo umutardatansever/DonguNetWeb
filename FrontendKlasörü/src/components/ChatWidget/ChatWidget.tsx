@@ -36,7 +36,7 @@ export default function ChatWidget({ chatMessages, onSend, isTyping }: ChatWidge
               <div className="w-8 h-8 rounded-lg bg-accent-mint/10 flex items-center justify-center border border-accent-mint/20">
                 <span className="material-symbols-outlined text-accent-mint text-[18px]">smart_toy</span>
               </div>
-              <span className="text-xs font-bold text-on-surface">DöngüNet AI Asistanı</span>
+              <span className="text-xs font-bold text-on-surface">EcoMatch AI Asistanı</span>
             </div>
             <button onClick={() => setOpen(false)} className="text-on-surface-variant hover:text-on-surface cursor-pointer">
               <span className="material-symbols-outlined text-[18px]">close</span>
